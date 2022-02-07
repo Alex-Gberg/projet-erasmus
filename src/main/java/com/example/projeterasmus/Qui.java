@@ -1,18 +1,17 @@
 package com.example.projeterasmus;
 
-import com.google.gson.Gson;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import org.json.*;
 
 public class Qui extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Gson gson = new Gson();
+        JSONObject j = new JSONObject();
 
         Display display = new Display(3, 8);
         Guesser guesser = new Guesser();

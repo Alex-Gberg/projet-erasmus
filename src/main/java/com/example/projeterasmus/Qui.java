@@ -6,12 +6,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import org.json.*;
+import com.google.gson.*;
 
 public class Qui extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        JSONObject j = new JSONObject();
+        Gson gson = new Gson();
+
 
         Display display = new Display(3, 8);
         Guesser guesser = new Guesser();

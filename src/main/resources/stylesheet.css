@@ -1,0 +1,50 @@
+#pane{
+    -fx-background-image: url("Guess_Who_Background.png");
+     -fx-background-size: 553 520;
+}
+
+#round-red{
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-pref-height: 28px;
+    -fx-pref-width: 200px;
+}
+
+#round-yellow{
+    -fx-background-color:
+            linear-gradient(#ffd65b, #e68400),
+            linear-gradient(#ffef84, #f2ba44),
+            linear-gradient(#ffea6a, #efaa22),
+            linear-gradient(#ffe657 0%, #f8c202 50%, #eea10b 100%),
+            linear-gradient(from 0% 0% to 15% 50%, rgba(255,255,255,0.9), rgba(255,255,255,0));
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-pref-height: 28px;
+    -fx-pref-width: 200px;
+}
+
+#round-green{
+    -fx-background-color:
+            linear-gradient(#f0ff35, #a9ff00),
+            radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-pref-height: 28px;
+    -fx-pref-width: 200px;
+}
+
+#tradeMarkLabel{
+    -fx-background-color: #EEEEEE;
+        -fx-font-size: 10px;
+         -fx-border-width: 2px 2px 2px 2px;
+         -fx-border-radius: 20px;
+         -fx-background-radius: 20px;
+         -fx-border-style: solid;
+}
+
+
+}

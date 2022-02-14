@@ -1,37 +1,57 @@
 package com.example.projeterasmus;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 
 public class Display {
     int numRows;
     int numColumns;
+    JsonObject root;
     VBox display;
     ArrayList<ImageView> imageViews;
     ArrayList<HBox> rows;
 
-    public Display(int numRows, int numColumns) {
-        this.numRows = numRows;
-        this.numColumns = numColumns;
+    public Display(String jsonName) {
+        String path = "src/main/resources/JSON/" + jsonName;
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+
+            Gson gson = new Gson();
+            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
+            root = json.getAsJsonObject();
+            this.numRows = root.get("ligne").getAsInt();
+            this.numColumns = root.get("column").getAsInt();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         display = new VBox();
         imageViews = new ArrayList<>();
         rows = new ArrayList<>();
-        loadPics(numRows, numColumns);
+        loadPics();
         fillRows(numRows, numColumns);
         display.getChildren().addAll(rows);
     }
 
-    private void loadPics(int numRows, int numColumns) {
-        for (int i = 1; i <= numRows*numColumns; i++) {
-            File file = new File("src/main/resources/personnages/imageonline-co-split-image" + (i !=1 ? ("-" + i) : "") + ".png");
-            Image image = new Image(file.toURI().toString());
-            ImageView imageView = new ImageView(image);
-            imageViews.add(imageView);
+    private void loadPics() {
+        String imageFolder = root.get("images").getAsString();
+        JsonObject pers = root.getAsJsonObject("personnages");
+        for (int i = 0; i < numRows*numColumns; i++) {
+            JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
+            File file = new File(imageFolder + obj.get("fichier").getAsString());
+            imageViews.add(new ImageView(new Image(file.toURI().toString())));
         }
     }
 

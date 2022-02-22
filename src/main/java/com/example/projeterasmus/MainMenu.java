@@ -13,28 +13,29 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class MainMenu {
-    Scene scene;
+    private Scene scene;
+
     public MainMenu(Stage stage) {
        // Create 3 Buttons for Easy, Medium, Difficult
         Button easyButton = new Button("Easy");
         easyButton.setId("round-green");
         easyButton.setOnAction(e -> {
-            Game game = new Game();
-            stage.setScene(game.getGameScene(stage));
+            Game game = new Game("jeux.json");
+            stage.setScene(game.getGameScene());
         });
 
         Button mediumButton = new Button("Medium");
         mediumButton.setId("round-yellow");
         mediumButton.setOnAction(e -> {
-            Game game = new Game();
-            stage.setScene(game.getGameScene(stage));
+            Game game = new Game("jeux.json");
+            stage.setScene(game.getGameScene());
         });
 
         Button hardButton = new Button("Hard");
         hardButton.setId("round-red");
         hardButton.setOnAction(e -> {
-            Game game = new Game();
-            stage.setScene(game.getGameScene(stage));
+            Game game = new Game("jeux.json");
+            stage.setScene(game.getGameScene());
         });
 
         // Create Borderpane Layout

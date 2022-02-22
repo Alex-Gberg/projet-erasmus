@@ -15,12 +15,12 @@ import java.io.FileReader;
 import java.util.ArrayList;
 
 public class Display {
-    int numRows;
-    int numColumns;
-    JsonObject root;
-    VBox display;
-    ArrayList<ImageView> imageViews;
-    ArrayList<HBox> rows;
+    private int numRows;
+    private int numColumns;
+    private JsonObject root;
+    private VBox display;
+    private ArrayList<ImageView> imageViews;
+    private ArrayList<HBox> rows;
 
     public Display(String jsonName) {
         String path = "src/main/resources/JSON/" + jsonName;

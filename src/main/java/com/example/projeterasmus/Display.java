@@ -14,6 +14,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 
+ /*
+   Display only displays the pictures.
+   imageViews is an arraylist holding ImageViews
+
+   Display constructor takes JSON
+   Get lignes and columns from JSON aka how pictures are listed later
+
+ */
+
 public class Display {
     private int numRows;
     private int numColumns;
@@ -46,8 +55,8 @@ public class Display {
     }
 
     private void loadPics() {
-        String imageFolder = root.get("images").getAsString();
-        JsonObject pers = root.getAsJsonObject("personnages");
+        String imageFolder = root.get("images").getAsString();  //Path to imageFolder
+        JsonObject pers = root.getAsJsonObject("personnages"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
             File file = new File(imageFolder + obj.get("fichier").getAsString());

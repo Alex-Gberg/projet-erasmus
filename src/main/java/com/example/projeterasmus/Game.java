@@ -25,10 +25,12 @@ public class Game {
     private int target;
     private JsonObject root;
     private HBox guesser;
+    private VBox optionsMenu;
     private HashMap<String, Set<String>> propertyMap;
     private ComboBox<String> propertySelector;
     private ComboBox<String> valueSelector;
     private Button guessButton;
+    private Button optionButton;
 
     public Game(String jsonName) {
         display = new Display(jsonName);
@@ -56,6 +58,11 @@ public class Game {
         propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
         guessButton = new Button("Guess!");
         constructGeusser();
+
+
+        optionsMenu = new VBox();
+        optionButton = new Button("Options");
+        constructOptionsMenu();
     }
 
     private void findProperties() {
@@ -79,8 +86,12 @@ public class Game {
         guesser.getChildren().addAll(propertySelector, valueSelector, guessButton);
     }
 
+    private void constructOptionsMenu() {
+        optionsMenu.getChildren().add(optionButton);
+    }
+
     public Scene getGameScene() {
-        Scene scene = new Scene(new VBox(display.getDisplay(), guesser));
+        Scene scene = new Scene(new VBox(optionsMenu, display.getDisplay(), guesser));
         return scene;
     }
 }

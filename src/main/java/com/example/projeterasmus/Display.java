@@ -28,8 +28,10 @@ public class Display {
     private int numColumns;
     private JsonObject root;
     private VBox display;
-    private ArrayList<ImageView> imageViews;
+    private ArrayList<HBox> imageViewsHBox;
+    private ArrayList<String> imageViewString;
     private ArrayList<HBox> rows;
+    private CrossOut crossOut;
 
     public Display(String jsonName) {
         String path = "src/main/resources/JSON/" + jsonName;
@@ -47,9 +49,15 @@ public class Display {
         }
 
         display = new VBox();
-        imageViews = new ArrayList<>();
+        imageViewsHBox = new ArrayList<>();
+        imageViewString = new ArrayList<>();
         rows = new ArrayList<>();
         loadPics();
+        loadPicsString();
+
+        //Test crossOutPic()
+        crossOutPic("Maria.png");
+
         fillRows(numRows, numColumns);
         display.getChildren().addAll(rows);
     }
@@ -60,20 +68,40 @@ public class Display {
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
             File file = new File(imageFolder + obj.get("fichier").getAsString());
-            imageViews.add(new ImageView(new Image(file.toURI().toString())));
+            ImageView imageView = new ImageView(new Image(file.toURI().toString()));
+            HBox hBox = new HBox();
+            hBox.getChildren().add(imageView);
+            imageViewsHBox.add(hBox);
         }
+    }
+
+    private void loadPicsString() {
+        String imageFolder = root.get("images").getAsString();  //Path to imageFolder
+        JsonObject pers = root.getAsJsonObject("personnages"); // All the stuff in personnage
+        for (int i = 0; i < numRows*numColumns; i++) {
+            JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
+            File file = new File(imageFolder + obj.get("fichier").getAsString());
+            imageViewString.add(file.toURI().toString());
+        }
+        System.out.println(imageViewString);
     }
 
     private void fillRows(int numRows, int numColumns) {
         for (int i = 0; i < numRows; i++) {
-            ArrayList<ImageView> row = new ArrayList<>();
+            ArrayList<HBox> row = new ArrayList<>();
             for (int j = 0; j < numColumns; j++) {
-                row.add(imageViews.get(i*numColumns + j));
+                row.add(imageViewsHBox.get(i*numColumns + j));
             }
             HBox rowBox = new HBox();
             rowBox.getChildren().addAll(row);
             rows.add(rowBox);
         }
+    }
+
+    private void crossOutPic(String PNGName) {
+        int index = imageViewString.indexOf("file:/C:/Users/toneu/IdeaProjects/projet-erasmus/src/main/resources/personnages/" + PNGName);
+        crossOut = new CrossOut(PNGName);
+        imageViewsHBox.set(index, crossOut.getLayout());
     }
 
     public VBox getDisplay() {

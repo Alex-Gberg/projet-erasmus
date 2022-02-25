@@ -27,12 +27,15 @@ public class Game {
     private int target;
     private JsonObject root;
     private HBox guesser;
-    private VBox optionsMenu;
+    private HBox optionsMenu;
     private HashMap<String, Set<String>> propertyMap;
     private ComboBox<String> propertySelector;
     private ComboBox<String> valueSelector;
     private Button guessButton;
     private Button optionButton;
+    private Button testWinningButton;
+    private Congratulations congratulations;
+    private Stage congratulationStage;
 
 
 
@@ -64,10 +67,13 @@ public class Game {
         constructGeusser();
 
 
-        optionsMenu = new VBox();
+        optionsMenu = new HBox();
         optionButton = new Button("Options");
-
         optionButton.setOnAction(e -> openOptions());
+
+        //For testing purposes of Congratulations message #Issue6. This button can be removed later.
+        testWinningButton = new Button("Test Winning");
+        testWinningButton.setOnAction(e -> openCongratulationsScene());
         constructOptionsMenu();
     }
 
@@ -94,12 +100,21 @@ public class Game {
     }
 
     private void constructOptionsMenu() {
-        optionsMenu.getChildren().add(optionButton);
+        optionsMenu.getChildren().addAll(optionButton, testWinningButton);
     }
 
     public Scene getGameScene() {
         Scene scene = new Scene(new VBox(optionsMenu, display.getDisplay(), guesser));
         return scene;
+    }
+
+    public void openCongratulationsScene(){
+        congratulationStage = new Stage();
+        congratulations = new Congratulations(congratulationStage);
+        Scene scene = new Scene(congratulations.getBorderPane(), 498, 350);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        congratulationStage.setScene(scene);
+        congratulationStage.show();
     }
 
 

@@ -46,5 +46,25 @@
          -fx-border-style: solid;
 }
 
+#congratsMessage{
+   -fx-background-color: #F9F7F5;
+       -fx-font-size: 20px;
+       -fx-font-weight: bold;
+        -fx-border-width: 2px 2px 2px 2px;
+        -fx-border-radius: 20px;
+        -fx-background-radius: 20px;
+        -fx-border-style: solid;
+}
+
+#congratulationsPane{
+    -fx-background-image: url("black.png");
+     -fx-background-size: 750 464;
+
+}
+
+#imageView{
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
 
 }

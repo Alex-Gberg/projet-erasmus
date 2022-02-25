@@ -27,7 +27,7 @@ public class Game {
     private int target;
     private JsonObject root;
     private HBox guesser;
-    private HBox optionsMenu;
+    private HBox optionsMenuBar;
     private HashMap<String, Set<String>> propertyMap;
     private ComboBox<String> propertySelector;
     private ComboBox<String> valueSelector;
@@ -36,6 +36,8 @@ public class Game {
     private Button testWinningButton;
     private Congratulations congratulations;
     private Stage congratulationStage;
+    private Stage optionsMenuStage;
+    private OptionsMenu optionsMenu;
 
 
 
@@ -67,9 +69,9 @@ public class Game {
         constructGeusser();
 
 
-        optionsMenu = new HBox();
+        optionsMenuBar = new HBox();
         optionButton = new Button("Options");
-        optionButton.setOnAction(e -> openOptions());
+        optionButton.setOnAction(e -> openOptionsMenu());
 
         //For testing purposes of Congratulations message #Issue6. This button can be removed later.
         testWinningButton = new Button("Test Winning");
@@ -100,11 +102,11 @@ public class Game {
     }
 
     private void constructOptionsMenu() {
-        optionsMenu.getChildren().addAll(optionButton, testWinningButton);
+        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton);
     }
 
     public Scene getGameScene() {
-        Scene scene = new Scene(new VBox(optionsMenu, display.getDisplay(), guesser));
+        Scene scene = new Scene(new VBox(optionsMenuBar, display.getDisplay(), guesser));
         return scene;
     }
 
@@ -114,53 +116,18 @@ public class Game {
         Scene scene = new Scene(congratulations.getBorderPane(), 498, 350);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         congratulationStage.setScene(scene);
+        congratulationStage.setTitle("Congratulations");
         congratulationStage.show();
     }
 
-
-
-    private void openOptions(){
-
-        Stage stage = new Stage();
-        // Create 3 Buttons for Resume, Restart, Quit
-        Button resumeButton = new Button("Resume");
-        resumeButton.setId("round-green");
-        resumeButton.setOnAction(e -> stage.close());
-
-
-        Button restartButton = new Button("Restart");
-        restartButton.setId("round-yellow");
-        restartButton.setOnAction(e -> {
-            Game game = new Game("jeux.json");
-            Qui.getPrimaryStage().setScene(game.getGameScene());
-            stage.close();
-        });
-
-
-        Button quitButton = new Button("Quit");
-        quitButton.setId("round-red");
-        quitButton.setOnAction(e -> {
-            Qui.getPrimaryStage().close();
-            stage.close();
-        });
-
-
-
-        // Put buttons VBox and Borderpane
-        VBox buttonsBox = new VBox();
-        buttonsBox.setAlignment(Pos.CENTER);
-        buttonsBox.setPadding(new Insets(10,10,10,10));
-        buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(resumeButton, restartButton, quitButton);
-
-
-        Scene scene = new Scene(buttonsBox);
+    private void openOptionsMenu(){
+        optionsMenuStage = new Stage();
+        optionsMenu = new OptionsMenu(optionsMenuStage);
+        Scene scene = new Scene(optionsMenu.getDisplay());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
-
-
-        stage.setScene(scene);
-        stage.show();
-
+        optionsMenuStage.setScene(scene);
+        optionsMenuStage.setTitle("Options");
+        optionsMenuStage.show();
     }
 
 

@@ -56,7 +56,7 @@
         -fx-border-style: solid;
 }
 
-#congratulationsPane{
+#backgroundBlack{
     -fx-background-image: url("black.png");
      -fx-background-size: 750 464;
 

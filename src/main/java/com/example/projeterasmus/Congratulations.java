@@ -33,7 +33,7 @@ public class Congratulations {
         playAgainButton.setId("round-green");
         playAgainButton.setOnAction(e -> {
             Game game = new Game("jeux.json");
-            Qui.getPrimaryStage().setScene(game.getGameScene());
+            MainMenu.getMenuStage().setScene(MainMenu.getMenuScene());
             stage.close();
         });
 
@@ -65,9 +65,7 @@ public class Congratulations {
         borderPane.setTop(titleVBox);
         borderPane.setCenter(imageView);
         borderPane.setBottom(buttonBox);
-
-
-        borderPane.setId("congratulationsPane");
+        borderPane.setId("backgroundBlack");
 
     }
 

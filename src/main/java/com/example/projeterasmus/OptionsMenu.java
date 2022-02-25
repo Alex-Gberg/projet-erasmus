@@ -1,30 +1,57 @@
 package com.example.projeterasmus;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.print.attribute.standard.Media;
+
 public class OptionsMenu {
 
-    private VBox display;
-    private Label label2;
-    private Button button2;
-    private Scene scene;
+    private BorderPane borderPane;
 
+    public OptionsMenu(Stage stage){
 
-    public OptionsMenu(){
+        // Create 3 Buttons for Resume, Restart, Quit
+        Button resumeButton = new Button("Resume");
+        resumeButton.setId("round-green");
+        resumeButton.setOnAction(e -> stage.close());
 
-        display= new VBox();
-        label2= new Label("This is the second scene");
-        button2= new Button("Go to scene 1");
-        display.getChildren().addAll(label2, button2);
+        Button restartButton = new Button("Restart");
+        restartButton.setId("round-yellow");
+        restartButton.setOnAction(e -> {
+            MainMenu.getMenuStage().setScene(MainMenu.getMenuScene());
+            stage.close();
+        });
+
+        Button quitButton = new Button("Quit");
+        quitButton.setId("round-red");
+        quitButton.setOnAction(e -> {
+            Qui.getPrimaryStage().close();
+            stage.close();
+        });
+
+        // Put buttons VBox and Borderpane
+        VBox buttonsBox = new VBox();
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.setPadding(new Insets(10,10,10,10));
+        buttonsBox.setSpacing(10);
+        buttonsBox.getChildren().addAll(resumeButton, restartButton, quitButton);
+
+        //BorderPane
+        borderPane = new BorderPane();
+        borderPane.setCenter(buttonsBox);
+        borderPane.setId("backgroundBlack");
     }
 
-    public VBox getDisplay() {
-        return display;
+    public BorderPane getDisplay() {
+        return borderPane;
     }
 
 

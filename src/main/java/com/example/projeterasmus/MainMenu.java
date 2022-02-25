@@ -13,9 +13,11 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class MainMenu {
-    private Scene scene;
+    private static Scene scene;
+    private static Stage menuStage;
 
     public MainMenu(Stage stage) {
+        menuStage = stage;
        // Create 3 Buttons for Easy, Medium, Difficult
         Button easyButton = new Button("Easy");
         easyButton.setId("round-green");
@@ -74,7 +76,13 @@ public class MainMenu {
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
     }
 
-    public Scene getMenuScene() {
+    public static Scene getMenuScene() {
         return scene;
     }
+
+    public static Stage getMenuStage() {
+        return menuStage;
+    }
+
+
 }

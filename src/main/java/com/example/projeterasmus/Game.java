@@ -38,6 +38,9 @@ public class Game {
     private Stage congratulationStage;
     private Stage optionsMenuStage;
     private OptionsMenu optionsMenu;
+    private Stage crossedOutPersonStage;
+    private CrossOut crossOut;
+    private Button crossedOutButton;
 
 
 
@@ -76,6 +79,11 @@ public class Game {
         //For testing purposes of Congratulations message #Issue6. This button can be removed later.
         testWinningButton = new Button("Test Winning");
         testWinningButton.setOnAction(e -> openCongratulationsScene());
+
+        //For testing purposes of crossedOutPerson -> aka blend 2 images togehter
+        crossedOutButton = new Button("Crossed Out Test");
+        crossedOutButton.setOnAction(e -> testCrossedOutPerson());
+
         constructOptionsMenu();
     }
 
@@ -102,7 +110,7 @@ public class Game {
     }
 
     private void constructOptionsMenu() {
-        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton);
+        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton, crossedOutButton);
     }
 
     public Scene getGameScene() {
@@ -130,5 +138,13 @@ public class Game {
         optionsMenuStage.show();
     }
 
+    public void testCrossedOutPerson(){
+        crossedOutPersonStage = new Stage();
+        crossOut = new CrossOut(crossedOutPersonStage);
+        Scene scene = new Scene(crossOut.getLayout());
+        crossedOutPersonStage.setScene(scene);
+        crossedOutPersonStage.setTitle("Crossed Out Example");
+        crossedOutPersonStage.show();
+    }
 
 }

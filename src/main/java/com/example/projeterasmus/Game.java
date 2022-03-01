@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Game {
@@ -24,21 +25,13 @@ public class Game {
     private JsonObject root;
     private HBox guesser;
     private HBox optionsMenuBar;
+    private ArrayList<Boolean> crossedOut;
     private HashMap<String, Set<String>> propertyMap;
     private ComboBox<String> propertySelector;
     private ComboBox<String> valueSelector;
     private Button guessButton;
     private Button optionButton;
     private Button testWinningButton;
-    private Congratulations congratulations;
-    private Stage congratulationStage;
-    private Stage optionsMenuStage;
-    private OptionsMenu optionsMenu;
-    private Stage crossedOutPersonStage;
-    private CrossOut crossOut;
-    private Button crossedOutButton;
-
-
 
     public Game(String jsonName) {
         display = new Display(jsonName);
@@ -49,8 +42,10 @@ public class Game {
             Gson gson = new Gson();
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
             root = json.getAsJsonObject();
-            this.numRows = root.get("ligne").getAsInt();
-            this.numColumns = root.get("column").getAsInt();
+            numRows = root.get("ligne").getAsInt();
+            numColumns = root.get("column").getAsInt();
+            crossedOut = new ArrayList<>();
+            for (int i = 0; i < numRows*numColumns; i++) { crossedOut.add(false); }
             Random rand = new Random();
             target = rand.nextInt(numRows*numColumns+1);
             System.out.println("The target is " + target + ": "+ root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(target)).get("prenom").getAsString());
@@ -65,6 +60,11 @@ public class Game {
         valueSelector = new ComboBox<>();
         propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
         guessButton = new Button("Guess!");
+        guessButton.setOnAction(e -> {
+            processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem());
+//            propertySelector.getSelectionModel().clearSelection();
+//            valueSelector.getSelectionModel().clearSelection();
+        });
         constructGeusser();
 
         optionsMenuBar = new HBox();
@@ -75,16 +75,12 @@ public class Game {
         testWinningButton = new Button("Test Winning");
         testWinningButton.setOnAction(e -> openCongratulationsScene());
 
-        //For testing purposes of crossedOutPerson -> aka blend 2 images togehter
-        crossedOutButton = new Button("Crossed Out Test");
-        crossedOutButton.setOnAction(e -> testCrossedOutPerson());
-
         constructOptionsMenu();
     }
 
 
     private void findProperties() {
-        Set<String> propSet = root.getAsJsonObject("personnages").getAsJsonObject("0").keySet();
+        Set<String> propSet = new HashSet<>(root.getAsJsonObject("personnages").getAsJsonObject("0").keySet());
         propSet.remove("fichier");
         propertyMap = new HashMap<>();
         for (String s : propSet) {
@@ -100,22 +96,9 @@ public class Game {
         System.out.println(propertyMap);
     }
 
-    private void constructGeusser() {
-        guesser.getChildren().addAll(propertySelector, valueSelector, guessButton);
-    }
-
-    private void constructOptionsMenu() {
-        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton, crossedOutButton);
-    }
-
-    public Scene getGameScene() {
-        Scene scene = new Scene(new VBox(optionsMenuBar, display.getDisplay(), guesser));
-        return scene;
-    }
-
     public void openCongratulationsScene(){
-        congratulationStage = new Stage();
-        congratulations = new Congratulations(congratulationStage);
+        Stage congratulationStage = new Stage();
+        Congratulations congratulations = new Congratulations(congratulationStage);
         Scene scene = new Scene(congratulations.getBorderPane(), 498, 350);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         congratulationStage.setScene(scene);
@@ -124,8 +107,8 @@ public class Game {
     }
 
     private void openOptionsMenu(){
-        optionsMenuStage = new Stage();
-        optionsMenu = new OptionsMenu(optionsMenuStage);
+        Stage optionsMenuStage = new Stage();
+        OptionsMenu optionsMenu = new OptionsMenu(optionsMenuStage);
         Scene scene = new Scene(optionsMenu.getDisplay());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         optionsMenuStage.setScene(scene);
@@ -133,13 +116,34 @@ public class Game {
         optionsMenuStage.show();
     }
 
-    public void testCrossedOutPerson(){
-        crossedOutPersonStage = new Stage();
-        crossOut = new CrossOut("Maria.png");
-        Scene scene = new Scene(crossOut.getLayout());
-        crossedOutPersonStage.setScene(scene);
-        crossedOutPersonStage.setTitle("Crossed Out Example");
-        crossedOutPersonStage.show();
+    private void processGuess(String property, String value) {
+        JsonObject pers = root.getAsJsonObject("personnages");
+
+        Boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
+
+        System.out.println("Guess -> " + property + ": " + value + "\nResponse -> " + response);
+
+        for (int i = 0; i < numRows*numColumns; i++) {
+            System.out.println(i);
+            if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
+            }
+            else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
+            }
+        }
     }
 
+    private void constructGeusser() {
+        guesser.getChildren().addAll(propertySelector, valueSelector, guessButton);
+    }
+
+    private void constructOptionsMenu() {
+        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton);
+    }
+
+    public Scene getGameScene() {
+        Scene scene = new Scene(new VBox(optionsMenuBar, display.getDisplay(), guesser));
+        return scene;
+    }
 }

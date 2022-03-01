@@ -10,7 +10,7 @@ public class Qui extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Guess Who? - Erasmus Project");
         primaryStage = stage;
-        stage.setResizable(false);
+//        stage.setResizable(false);
         MainMenu menu = new MainMenu(stage);
         stage.setScene(menu.getMenuScene());
         stage.show();

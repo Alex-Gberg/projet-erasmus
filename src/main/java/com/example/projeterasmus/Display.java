@@ -27,6 +27,7 @@ public class Display {
     private int numRows;
     private int numColumns;
     private JsonObject root;
+    private String imageFolder;
     private VBox display;
     private ArrayList<HBox> imageViewsHBox;
     private ArrayList<String> imageViewString;
@@ -41,8 +42,9 @@ public class Display {
             Gson gson = new Gson();
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
             root = json.getAsJsonObject();
-            this.numRows = root.get("ligne").getAsInt();
-            this.numColumns = root.get("column").getAsInt();
+            numRows = root.get("ligne").getAsInt();
+            numColumns = root.get("column").getAsInt();
+            imageFolder = root.get("images").getAsString(); //Path to imageFolder
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -55,15 +57,11 @@ public class Display {
         loadPics();
         loadPicsString();
 
-        //Test crossOutPic()
-        crossOutPic("Maria.png");
-
         fillRows(numRows, numColumns);
-        display.getChildren().addAll(rows);
+        display.getChildren().setAll(rows);
     }
 
     private void loadPics() {
-        String imageFolder = root.get("images").getAsString();  //Path to imageFolder
         JsonObject pers = root.getAsJsonObject("personnages"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
@@ -76,17 +74,17 @@ public class Display {
     }
 
     private void loadPicsString() {
-        String imageFolder = root.get("images").getAsString();  //Path to imageFolder
         JsonObject pers = root.getAsJsonObject("personnages"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
             File file = new File(imageFolder + obj.get("fichier").getAsString());
-            imageViewString.add(file.toURI().toString());
+            imageViewString.add(imageFolder + obj.get("fichier").getAsString());
         }
         System.out.println(imageViewString);
     }
 
     private void fillRows(int numRows, int numColumns) {
+        rows.clear();
         for (int i = 0; i < numRows; i++) {
             ArrayList<HBox> row = new ArrayList<>();
             for (int j = 0; j < numColumns; j++) {
@@ -98,17 +96,15 @@ public class Display {
         }
     }
 
-    private void crossOutPic(String PNGName) {
-        int index = imageViewString.indexOf("file:/C:/Users/toneu/IdeaProjects/projet-erasmus/src/main/resources/personnages/" + PNGName);
-        crossOut = new CrossOut(PNGName);
+    public void crossOutPic(String PNGName) {
+        int index = imageViewString.indexOf(imageFolder + PNGName);
+        crossOut = new CrossOut(imageFolder + PNGName);
         imageViewsHBox.set(index, crossOut.getLayout());
+        fillRows(numRows, numColumns);
+        display.getChildren().setAll(rows);
     }
 
     public VBox getDisplay() {
         return display;
     }
-
-
-
-
 }

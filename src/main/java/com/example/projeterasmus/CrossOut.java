@@ -21,7 +21,7 @@ public class CrossOut {
         ImageView top = new ImageView(redCross);
         top.setFitHeight(75);
         top.setFitWidth(75);
-        top.setBlendMode(BlendMode.DARKEN);
+//        top.setBlendMode(BlendMode.DARKEN);
 
         Group blend = new Group(bottom, top);
 

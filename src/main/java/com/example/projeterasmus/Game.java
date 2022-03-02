@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -30,8 +31,8 @@ public class Game {
     private ComboBox<String> propertySelector;
     private ComboBox<String> valueSelector;
     private Button guessButton;
+    private Label guessResult;
     private Button optionButton;
-    private Button testWinningButton;
 
     public Game(String jsonName) {
         display = new Display(jsonName);
@@ -65,15 +66,12 @@ public class Game {
 //            propertySelector.getSelectionModel().clearSelection();
 //            valueSelector.getSelectionModel().clearSelection();
         });
+        guessResult = new Label();
         constructGeusser();
 
         optionsMenuBar = new HBox();
         optionButton = new Button("Options");
         optionButton.setOnAction(e -> openOptionsMenu());
-
-        //For testing purposes of Congratulations message #Issue6. This button can be removed later.
-        testWinningButton = new Button("Test Winning");
-        testWinningButton.setOnAction(e -> openCongratulationsScene());
 
         constructOptionsMenu();
     }
@@ -117,14 +115,20 @@ public class Game {
     }
 
     private void processGuess(String property, String value) {
+        if (property == null || value == null) {
+            guessResult.setText("Entrée invalide");
+            return;
+        }
+
         JsonObject pers = root.getAsJsonObject("personnages");
 
         Boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
 
+        guessResult.setText("Réponse: " + (response ? "Oui!" : "Non"));
+
         System.out.println("Guess -> " + property + ": " + value + "\nResponse -> " + response);
 
         for (int i = 0; i < numRows*numColumns; i++) {
-            System.out.println(i);
             if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
                 display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
             }
@@ -132,14 +136,19 @@ public class Game {
                 display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
             }
         }
+
+        if (property.equals("prenom") && response) {
+            openCongratulationsScene();
+            return;
+        }
     }
 
     private void constructGeusser() {
-        guesser.getChildren().addAll(propertySelector, valueSelector, guessButton);
+        guesser.getChildren().addAll(propertySelector, valueSelector, guessButton, guessResult);
     }
 
     private void constructOptionsMenu() {
-        optionsMenuBar.getChildren().addAll(optionButton, testWinningButton);
+        optionsMenuBar.getChildren().addAll(optionButton);
     }
 
     public Scene getGameScene() {

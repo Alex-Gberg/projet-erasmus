@@ -1,5 +1,8 @@
 package com.example.projeterasmus;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +13,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainMenu {
@@ -18,25 +25,34 @@ public class MainMenu {
 
     public MainMenu(Stage stage) {
         menuStage = stage;
-       // Create 3 Buttons for Easy, Medium, Difficult
-        Button easyButton = new Button("Easy");
+       // Create 2 Buttons for new game, load game
+        Button easyButton = new Button("New Game");
         easyButton.setId("round-green");
         easyButton.setOnAction(e -> {
             Game game = new Game("jeux.json");
             stage.setScene(game.getGameScene());
         });
 
-        Button mediumButton = new Button("Medium");
+        Button mediumButton = new Button("Load Game");
         mediumButton.setId("round-yellow");
         mediumButton.setOnAction(e -> {
-            Game game = new Game("jeux.json");
-            stage.setScene(game.getGameScene());
-        });
+            BufferedReader bufferedReader = null;
+            try {
+                bufferedReader = new BufferedReader(new FileReader("src/main/resources/JSON/save.json"));
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
 
-        Button hardButton = new Button("Hard");
-        hardButton.setId("round-red");
-        hardButton.setOnAction(e -> {
-            Game game = new Game("jeux.json");
+            Gson gson = new Gson();
+            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
+            JsonObject root = json.getAsJsonObject();
+
+            ArrayList<Boolean> crossedOut = new ArrayList<>();
+            for (JsonElement o : root.get("crossedOut").getAsJsonArray()) {
+                crossedOut.add(o.getAsBoolean());
+            }
+
+            Game game = new Game(root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
             stage.setScene(game.getGameScene());
         });
 
@@ -49,7 +65,7 @@ public class MainMenu {
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(350,0,133,80));
         buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(easyButton, mediumButton, hardButton);
+        buttonsBox.getChildren().addAll(easyButton, mediumButton);
 
         // Create Label
         Label tradeMarkLabel = new Label("@Guess Who? - Erasmus Project");

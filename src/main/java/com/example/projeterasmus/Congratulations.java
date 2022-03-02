@@ -32,7 +32,6 @@ public class Congratulations {
         Button playAgainButton = new Button("Play Again");
         playAgainButton.setId("round-green");
         playAgainButton.setOnAction(e -> {
-            Game game = new Game("jeux.json");
             MainMenu.getMenuStage().setScene(MainMenu.getMenuScene());
             stage.close();
         });

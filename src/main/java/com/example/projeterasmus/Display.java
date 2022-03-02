@@ -80,7 +80,6 @@ public class Display {
             File file = new File(imageFolder + obj.get("fichier").getAsString());
             imageViewString.add(imageFolder + obj.get("fichier").getAsString());
         }
-        System.out.println(imageViewString);
     }
 
     private void fillRows(int numRows, int numColumns) {

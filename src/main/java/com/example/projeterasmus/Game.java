@@ -158,11 +158,12 @@ public class Game {
         System.out.println("Guess -> " + property + ": " + value + "\nResponse -> " + response);
 
         for (int i = 0; i < numRows*numColumns; i++) {
-            if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
-            }
-            else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+            if (!crossedOut.get(i)) {
+                if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                    display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                } else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                    display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                }
             }
         }
 

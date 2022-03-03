@@ -93,7 +93,7 @@ public class Display {
     }
 
     public void crossOutPicAuto(String PNGName, boolean updateCrossedOut) {
-        Group crossedOut = new CrossOut(imageFolder + PNGName).getLayout();
+        Group crossedOut = constructBlend(imageFolder + PNGName);
         crossedOut.setOnMouseClicked((MouseEvent e) -> {
             Group g = (Group) e.getSource();
             crossOutPicManual(g);
@@ -107,9 +107,10 @@ public class Display {
     }
 
     private void crossOutPicManual(Node node) {
+        if (game.getAutoMode()) { return; }
         int index = nodes.indexOf(node);
         if (node instanceof ImageView) {
-            Group crossedOut = new CrossOut(imageViewString.get(nodes.indexOf(node))).getLayout();
+            Group crossedOut = constructBlend(imageViewString.get(nodes.indexOf(node)));
             crossedOut.setOnMouseClicked((MouseEvent e) -> {
                 Group g = (Group) e.getSource();
                 crossOutPicManual(g);
@@ -133,6 +134,16 @@ public class Display {
         fillRows(numRows, numColumns);
         display.getChildren().setAll(rows);
         game.toggleCrossedOut(index);
+    }
+
+    private Group constructBlend(String imagePath) {
+        File file = new File(imagePath);
+        ImageView bottom = new ImageView(new Image(file.toURI().toString()));
+        ImageView top = new ImageView(new Image("RedCross.png"));
+        top.setFitHeight(75);
+        top.setFitWidth(75);
+
+        return new Group(bottom, top);
     }
 
     public VBox getDisplay() {

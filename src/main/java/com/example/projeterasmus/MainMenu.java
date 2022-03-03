@@ -20,18 +20,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainMenu {
-    private static Scene scene;
-    private static Stage menuStage;
-
     public MainMenu(Stage stage) {
-        menuStage = stage;
        // Create 3 Buttons for new game, load game, quit game
         Button newGameButton = new Button("Nouveau jeu");
         newGameButton.setId("round-green");
-        newGameButton.setOnAction(e -> {
-            Game game = new Game("jeux.json");
-            stage.setScene(game.getGameScene());
-        });
+        newGameButton.setOnAction(e -> new Game(stage, "jeux.json"));
 
         Button loadGameButton = new Button("Continuer la partie");
         loadGameButton.setId("round-yellow");
@@ -52,13 +45,12 @@ public class MainMenu {
                 crossedOut.add(o.getAsBoolean());
             }
 
-            Game game = new Game(root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
-            stage.setScene(game.getGameScene());
+            new Game(stage, root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
         });
 
         Button quitGameButton = new Button("Quitter le jeu");
         quitGameButton.setId("round-red");
-        quitGameButton.setOnAction(e -> Qui.getPrimaryStage().close());
+        quitGameButton.setOnAction(e -> stage.close());
 
         // Create Borderpane Layout
         BorderPane borderPane = new BorderPane();
@@ -92,17 +84,8 @@ public class MainMenu {
         borderPane.setBottom(bottomBox);
 
 
-        scene = new Scene(borderPane, 553, 520);
+        Scene scene = new Scene(borderPane, 553, 520);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        stage.setScene(scene);
     }
-
-    public static Scene getMenuScene() {
-        return scene;
-    }
-
-    public static Stage getMenuStage() {
-        return menuStage;
-    }
-
-
 }

@@ -1,6 +1,7 @@
 package com.example.projeterasmus;
 
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -10,11 +11,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Congratulations {
-
-    private BorderPane borderPane;
-
-    public Congratulations(Stage stage) {
+    public Congratulations(Stage mainStage) {
+        Stage congratulationStage = new Stage();
 
         //CongratulationsMessage
         Label congratsMessage= new Label("Félicitations tu as gagné!");
@@ -32,16 +33,16 @@ public class Congratulations {
         Button playAgainButton = new Button("Rejouer");
         playAgainButton.setId("round-green");
         playAgainButton.setOnAction(e -> {
-            MainMenu.getMenuStage().setScene(MainMenu.getMenuScene());
-            stage.close();
+            new MainMenu(mainStage);
+            congratulationStage.close();
         });
 
 
         Button quitButton = new Button("Quitter le jeu");
         quitButton.setId("round-red");
         quitButton.setOnAction(e -> {
-            Qui.getPrimaryStage().close();
-            stage.close();
+            mainStage.close();
+            congratulationStage.close();
         });
 
         //Add both buttons to buttonBox
@@ -60,16 +61,16 @@ public class Congratulations {
         imageView.setImage(image);
 
         //BorderPane
-        borderPane = new BorderPane();
+        BorderPane borderPane = new BorderPane();
         borderPane.setTop(titleVBox);
         borderPane.setCenter(imageView);
         borderPane.setBottom(buttonBox);
         borderPane.setId("backgroundBlack");
 
+        Scene scene = new Scene(borderPane, 498, 350);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        congratulationStage.setScene(scene);
+        congratulationStage.setTitle("Félicitations");
+        congratulationStage.show();
     }
-
-    public BorderPane getBorderPane(){
-        return borderPane;
-    }
-
 }

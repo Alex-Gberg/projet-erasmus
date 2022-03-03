@@ -18,6 +18,7 @@ import java.io.FileReader;
 import java.util.*;
 
 public class Game {
+    private Stage stage;
     private Display display;
     private final String jsonName;
     private int numRows;
@@ -32,8 +33,11 @@ public class Game {
     private Button guessButton;
     private Label guessResult;
     private Button optionButton;
+    private boolean autoMode;
+    private Label modeLabel;
 
-    public Game(String jsonName) {
+    public Game(Stage stage, String jsonName) {
+        this.stage = stage;
         this.jsonName = jsonName;
         String path = "src/main/resources/JSON/" + jsonName;
         try {
@@ -57,7 +61,8 @@ public class Game {
         auxConstructor();
     }
 
-    public Game(String jsonName, int target, ArrayList<Boolean> crossedOut) {
+    public Game(Stage stage, String jsonName, int target, ArrayList<Boolean> crossedOut) {
+        this.stage = stage;
         this.jsonName = jsonName;
         String path = "src/main/resources/JSON/" + jsonName;
         try {
@@ -102,7 +107,10 @@ public class Game {
         constructGuesser();
 
         optionButton = new Button("Options");
-        optionButton.setOnAction(e -> openOptionsMenu());
+        optionButton.setOnAction(e -> new OptionsMenu(stage, this));
+        autoMode = true;
+        modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
+        stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
     }
 
     private HashMap<String, Set<String>> findProperties(JsonObject root) {
@@ -122,27 +130,6 @@ public class Game {
         return map;
     }
 
-    public void openCongratulationsScene(){
-        Stage congratulationStage = new Stage();
-        Congratulations congratulations = new Congratulations(congratulationStage);
-        Scene scene = new Scene(congratulations.getBorderPane(), 498, 350);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
-        congratulationStage.setScene(scene);
-        congratulationStage.setTitle("Félicitations");
-        congratulationStage.show();
-    }
-
-    private void openOptionsMenu() {
-        Stage optionsMenuStage = new Stage();
-        optionsMenuStage.setResizable(false);
-        OptionsMenu optionsMenu = new OptionsMenu(optionsMenuStage, this);
-        Scene scene = new Scene(optionsMenu.getDisplay());
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
-        optionsMenuStage.setScene(scene);
-        optionsMenuStage.setTitle("Options");
-        optionsMenuStage.show();
-    }
-
     private void processGuess(String property, String value) {
         if (property == null || value == null) {
             guessResult.setText("Entrée invalide");
@@ -157,23 +144,30 @@ public class Game {
 
         System.out.println("Guess -> " + property + ": " + value + "\nResponse -> " + response);
 
-        for (int i = 0; i < numRows*numColumns; i++) {
-            if (!crossedOut.get(i)) {
-                if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                    display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
-                } else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                    display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+        if (autoMode) {
+            for (int i = 0; i < numRows * numColumns; i++) {
+                if (!crossedOut.get(i)) {
+                    if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                        display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                    } else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
+                        display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                    }
                 }
             }
         }
 
         if (property.equals("prenom") && response) {
-            openCongratulationsScene();
+            new Congratulations(stage);
         }
     }
 
     public void toggleCrossedOut(int i) {
         crossedOut.set(i, !crossedOut.get(i));
+    }
+
+    public void toggleMode() {
+        autoMode = !autoMode;
+        modeLabel.setText("Mode: " + (autoMode ? "Automatic" : "Manual"));
     }
 
     public void save() {
@@ -188,9 +182,7 @@ public class Game {
                                                     new VBox(guessResult, guessButton))));
     }
 
-    public Scene getGameScene() {
-        return new Scene(new VBox(optionButton, display.getDisplay(), guesser));
-    }
-
     public String getJsonName() { return jsonName; }
+
+    public boolean getAutoMode() { return autoMode; }
 }

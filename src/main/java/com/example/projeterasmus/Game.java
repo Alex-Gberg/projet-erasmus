@@ -1,7 +1,6 @@
 package com.example.projeterasmus;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.collections.FXCollections;
@@ -13,13 +12,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.*;
-import java.lang.reflect.Array;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 public class Game {
     private Display display;
-    private String jsonName;
+    private final String jsonName;
     private int numRows;
     private int numColumns;
     private int target;
@@ -47,7 +47,7 @@ public class Game {
             crossedOut = new ArrayList<>();
             for (int i = 0; i < numRows*numColumns; i++) { crossedOut.add(false); }
             Random rand = new Random();
-            target = rand.nextInt(numRows*numColumns+1);
+            target = rand.nextInt(numRows*numColumns);
             System.out.println("The target is " + target + ": "+ root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(target)).get("prenom").getAsString());
         }
         catch (FileNotFoundException e) {
@@ -80,26 +80,26 @@ public class Game {
 
         for (int i = 0; i < crossedOut.size(); i++) {
             if (crossedOut.get(i)) {
-                display.crossOutPic(root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
+                display.crossOutPicAuto(root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), false);
             }
         }
     }
 
     private void auxConstructor() {
-        display = new Display(jsonName);
+        display = new Display(this);
 
         propertyMap = findProperties(root);
 
         guesser = new HBox();
         propertySelector = new ComboBox<>(FXCollections.observableArrayList(propertyMap.keySet()));
+        propertySelector.setPromptText("Choisir un attribut");
         valueSelector = new ComboBox<>();
+        valueSelector.setPromptText("Choisir une valeur");
         propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
-        guessButton = new Button("Guess!");
-        guessButton.setOnAction(e -> {
-            processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem());
-        });
+        guessButton = new Button("Interroger!");
+        guessButton.setOnAction(e -> processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem()));
         guessResult = new Label();
-        constructGeusser();
+        constructGuesser();
 
         optionButton = new Button("Options");
         optionButton.setOnAction(e -> openOptionsMenu());
@@ -128,12 +128,13 @@ public class Game {
         Scene scene = new Scene(congratulations.getBorderPane(), 498, 350);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         congratulationStage.setScene(scene);
-        congratulationStage.setTitle("Congratulations");
+        congratulationStage.setTitle("Félicitations");
         congratulationStage.show();
     }
 
     private void openOptionsMenu() {
         Stage optionsMenuStage = new Stage();
+        optionsMenuStage.setResizable(false);
         OptionsMenu optionsMenu = new OptionsMenu(optionsMenuStage, this);
         Scene scene = new Scene(optionsMenu.getDisplay());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
@@ -158,12 +159,10 @@ public class Game {
 
         for (int i = 0; i < numRows*numColumns; i++) {
             if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
-                crossedOut.set(i, true);
+                display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
             }
             else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                display.crossOutPic(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString());
-                crossedOut.set(i, true);
+                display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
             }
         }
 
@@ -172,16 +171,25 @@ public class Game {
         }
     }
 
+    public void toggleCrossedOut(int i) {
+        crossedOut.set(i, !crossedOut.get(i));
+    }
+
     public void save() {
         Save save = new Save(jsonName, target, crossedOut);
         save.saveToFile();
     }
 
-    private void constructGeusser() {
-        guesser.getChildren().addAll(propertySelector, valueSelector, guessButton, guessResult);
+    private void constructGuesser() {
+        guesser.getChildren().addAll(new VBox(new Label("Poser une question:"),
+                                            new HBox(new VBox(new Label("Attribut:"), propertySelector),
+                                                    new VBox(new Label("Valeur:"), valueSelector),
+                                                    new VBox(guessResult, guessButton))));
     }
 
     public Scene getGameScene() {
         return new Scene(new VBox(optionButton, display.getDisplay(), guesser));
     }
+
+    public String getJsonName() { return jsonName; }
 }

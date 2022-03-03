@@ -7,12 +7,12 @@ import javafx.stage.Stage;
 public class Qui extends Application {
     private static Stage primaryStage;
     @Override
-    public void start(Stage stage) throws Exception {
-        stage.setTitle("Guess Who? - Erasmus Project");
+    public void start(Stage stage) {
+        stage.setTitle("Qui-est-ce? - Groupe Erasmus");
         primaryStage = stage;
-//        stage.setResizable(false);
+        stage.setResizable(false);
         MainMenu menu = new MainMenu(stage);
-        stage.setScene(menu.getMenuScene());
+        stage.setScene(MainMenu.getMenuScene());
         stage.show();
     }
 

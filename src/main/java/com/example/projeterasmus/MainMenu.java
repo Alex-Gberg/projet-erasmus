@@ -25,17 +25,17 @@ public class MainMenu {
 
     public MainMenu(Stage stage) {
         menuStage = stage;
-       // Create 2 Buttons for new game, load game
-        Button easyButton = new Button("New Game");
-        easyButton.setId("round-green");
-        easyButton.setOnAction(e -> {
+       // Create 3 Buttons for new game, load game, quit game
+        Button newGameButton = new Button("Nouveau jeu");
+        newGameButton.setId("round-green");
+        newGameButton.setOnAction(e -> {
             Game game = new Game("jeux.json");
             stage.setScene(game.getGameScene());
         });
 
-        Button mediumButton = new Button("Load Game");
-        mediumButton.setId("round-yellow");
-        mediumButton.setOnAction(e -> {
+        Button loadGameButton = new Button("Continuer la partie");
+        loadGameButton.setId("round-yellow");
+        loadGameButton.setOnAction(e -> {
             BufferedReader bufferedReader = null;
             try {
                 bufferedReader = new BufferedReader(new FileReader("src/main/resources/JSON/save.json"));
@@ -56,6 +56,10 @@ public class MainMenu {
             stage.setScene(game.getGameScene());
         });
 
+        Button quitGameButton = new Button("Quitter le jeu");
+        quitGameButton.setId("round-red");
+        quitGameButton.setOnAction(e -> Qui.getPrimaryStage().close());
+
         // Create Borderpane Layout
         BorderPane borderPane = new BorderPane();
         borderPane.setId("pane");
@@ -65,10 +69,10 @@ public class MainMenu {
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(350,0,133,80));
         buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(easyButton, mediumButton);
+        buttonsBox.getChildren().addAll(newGameButton, loadGameButton, quitGameButton);
 
         // Create Label
-        Label tradeMarkLabel = new Label("@Guess Who? - Erasmus Project");
+        Label tradeMarkLabel = new Label("@Qui-est-ce? - Groupe Erasmus");
         tradeMarkLabel.setId("tradeMarkLabel");
 
         // HBox for Label

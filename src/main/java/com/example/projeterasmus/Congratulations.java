@@ -29,7 +29,7 @@ public class Congratulations {
         titleVBox.setSpacing(10);
 
         //Create two buttons: Play Again & Quit
-        Button playAgainButton = new Button("Play Again");
+        Button playAgainButton = new Button("Rejouer");
         playAgainButton.setId("round-green");
         playAgainButton.setOnAction(e -> {
             MainMenu.getMenuStage().setScene(MainMenu.getMenuScene());
@@ -37,7 +37,7 @@ public class Congratulations {
         });
 
 
-        Button quitButton = new Button("Quit");
+        Button quitButton = new Button("Quitter le jeu");
         quitButton.setId("round-red");
         quitButton.setOnAction(e -> {
             Qui.getPrimaryStage().close();

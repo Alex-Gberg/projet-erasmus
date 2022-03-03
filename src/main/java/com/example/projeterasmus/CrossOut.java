@@ -1,35 +1,32 @@
 package com.example.projeterasmus;
 
 import javafx.scene.Group;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 
 import java.io.File;
 
 public class CrossOut {
 
-    private HBox layout;
+    private Group blend;
+    private Image personImg;
 
     public CrossOut(String imagePath) {
         File file = new File(imagePath);
-        Image person = new Image(file.toURI().toString());
+        personImg = new Image(file.toURI().toString());
         Image redCross = new Image("RedCross.png");
 
-        ImageView bottom = new ImageView(person);
+        ImageView bottom = new ImageView(personImg);
         ImageView top = new ImageView(redCross);
         top.setFitHeight(75);
         top.setFitWidth(75);
-//        top.setBlendMode(BlendMode.DARKEN);
 
-        Group blend = new Group(bottom, top);
-
-        layout = new HBox();
-        layout.getChildren().add(blend);
+        blend = new Group(bottom, top);
     }
 
-    public HBox getLayout() {
-        return layout;
+    public Group getLayout() {
+        return blend;
     }
+
+    public Image getPersonImg() { return personImg; }
 }

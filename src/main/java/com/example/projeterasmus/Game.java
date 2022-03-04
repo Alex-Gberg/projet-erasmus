@@ -147,7 +147,7 @@ public class Game {
             }
         }
 
-        if (property.equals("prenom") && response) {
+        if (property.equals("nom") && response) {
             new Congratulations(stage);
         }
     }

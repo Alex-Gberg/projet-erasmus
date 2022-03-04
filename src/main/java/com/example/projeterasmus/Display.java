@@ -28,13 +28,12 @@ import java.util.ArrayList;
 
 public class Display {
     private Game game;
+    private JsonObject root;
     private int numRows;
     private int numColumns;
-    private JsonObject root;
     private String imageFolder;
     private VBox display;
     private ArrayList<Node> nodes;
-    private ArrayList<String> imageViewString;
     private ArrayList<HBox> rows;
 
     public Display(Game game) {
@@ -56,7 +55,6 @@ public class Display {
 
         display = new VBox();
         nodes = new ArrayList<>();
-        imageViewString = new ArrayList<>();
         rows = new ArrayList<>();
         loadPics();
 
@@ -65,11 +63,10 @@ public class Display {
     }
 
     private void loadPics() {
-        JsonObject pers = root.getAsJsonObject("personnages"); // All the stuff in personnage
+        JsonObject pers = root.getAsJsonObject("possibilites"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
             File file = new File(imageFolder + obj.get("fichier").getAsString());
-            imageViewString.add(imageFolder + obj.get("fichier").getAsString());
             ImageView imageView = new ImageView(new Image(file.toURI().toString()));
             imageView.setOnMouseClicked((MouseEvent e) -> {
                 ImageView iv = (ImageView) e.getTarget();
@@ -92,14 +89,14 @@ public class Display {
         }
     }
 
-    public void crossOutPicAuto(String PNGName, boolean updateCrossedOut) {
-        Group crossedOut = constructBlend(imageFolder + PNGName);
+    public void crossOutPicAuto(int index, boolean updateCrossedOut) {
+        String PNGName = root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
+        Group crossedOut = crossOut(imageFolder + PNGName);
         crossedOut.setOnMouseClicked((MouseEvent e) -> {
             Group g = (Group) e.getSource();
             crossOutPicManual(g);
         });
 
-        int index = imageViewString.indexOf(imageFolder + PNGName);
         nodes.set(index, crossedOut);
         fillRows(numRows, numColumns);
         display.getChildren().setAll(rows);
@@ -110,7 +107,8 @@ public class Display {
         if (game.getAutoMode()) { return; }
         int index = nodes.indexOf(node);
         if (node instanceof ImageView) {
-            Group crossedOut = constructBlend(imageViewString.get(nodes.indexOf(node)));
+            String PNGName = root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
+            Group crossedOut = crossOut(imageFolder + PNGName);
             crossedOut.setOnMouseClicked((MouseEvent e) -> {
                 Group g = (Group) e.getSource();
                 crossOutPicManual(g);
@@ -136,7 +134,7 @@ public class Display {
         game.toggleCrossedOut(index);
     }
 
-    private Group constructBlend(String imagePath) {
+    private Group crossOut(String imagePath) {
         File file = new File(imagePath);
         ImageView bottom = new ImageView(new Image(file.toURI().toString()));
         ImageView top = new ImageView(new Image("RedCross.png"));

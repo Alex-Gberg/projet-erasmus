@@ -20,7 +20,7 @@ import java.util.*;
 public class Game {
     private Stage stage;
     private Display display;
-    private final String jsonName;
+    private String jsonName;
     private int numRows;
     private int numColumns;
     private int target;
@@ -37,60 +37,50 @@ public class Game {
     private Label modeLabel;
 
     public Game(Stage stage, String jsonName) {
-        this.stage = stage;
-        this.jsonName = jsonName;
-        String path = "src/main/resources/JSON/" + jsonName;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        auxConstructor(stage, jsonName);
 
-            Gson gson = new Gson();
-            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
-            root = json.getAsJsonObject();
-            numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("column").getAsInt();
-            crossedOut = new ArrayList<>();
-            for (int i = 0; i < numRows*numColumns; i++) { crossedOut.add(false); }
-            Random rand = new Random();
-            target = rand.nextInt(numRows*numColumns);
-            System.out.println("The target is " + target + ": "+ root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(target)).get("prenom").getAsString());
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        crossedOut = new ArrayList<>();
+        for (int i = 0; i < numRows*numColumns; i++) { crossedOut.add(false); }
 
-        auxConstructor();
+        Random rand = new Random();
+        target = rand.nextInt(numRows*numColumns);
+
+        System.out.println("The target is " + target + ": "+ root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
     }
 
     public Game(Stage stage, String jsonName, int target, ArrayList<Boolean> crossedOut) {
-        this.stage = stage;
-        this.jsonName = jsonName;
-        String path = "src/main/resources/JSON/" + jsonName;
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        auxConstructor(stage, jsonName);
 
-            Gson gson = new Gson();
-            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
-            root = json.getAsJsonObject();
-            numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("column").getAsInt();
-            this.crossedOut = crossedOut;
-            this.target = target;
-            System.out.println("The target is " + target + ": "+ root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(target)).get("prenom").getAsString());
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.crossedOut = crossedOut;
 
-        auxConstructor();
+        this.target = target;
+
+        System.out.println("The target is " + target + ": "+ root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
 
         for (int i = 0; i < crossedOut.size(); i++) {
             if (crossedOut.get(i)) {
-                display.crossOutPicAuto(root.getAsJsonObject("personnages").getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), false);
+                display.crossOutPicAuto(i, false);
             }
         }
     }
 
-    private void auxConstructor() {
+    private void auxConstructor(Stage stage, String jsonName) {
+        this.stage = stage;
+        this.jsonName = jsonName;
+        String path = "src/main/resources/JSON/" + jsonName;
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+
+            Gson gson = new Gson();
+            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
+            root = json.getAsJsonObject();
+            numRows = root.get("ligne").getAsInt();
+            numColumns = root.get("column").getAsInt();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         display = new Display(this);
 
         propertyMap = findProperties(root);
@@ -110,18 +100,19 @@ public class Game {
         optionButton.setOnAction(e -> new Options(stage, this));
         autoMode = true;
         modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
+
         stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
     }
 
     private HashMap<String, Set<String>> findProperties(JsonObject root) {
-        Set<String> propSet = new HashSet<>(root.getAsJsonObject("personnages").getAsJsonObject("0").keySet());
+        Set<String> propSet = new HashSet<>(root.getAsJsonObject("possibilites").getAsJsonObject("0").keySet());
         propSet.remove("fichier");
         HashMap<String, Set<String>> map = new HashMap<>();
         for (String s : propSet) {
             map.put(s, new HashSet<>());
         }
 
-        JsonObject pers = root.getAsJsonObject("personnages");
+        JsonObject pers = root.getAsJsonObject("possibilites");
         for (int i = 0; i < numRows*numColumns; i++) {
             for (String s : propSet) {
                 map.get(s).add(pers.getAsJsonObject(String.valueOf(i)).get(s).getAsString());
@@ -136,7 +127,7 @@ public class Game {
             return;
         }
 
-        JsonObject pers = root.getAsJsonObject("personnages");
+        JsonObject pers = root.getAsJsonObject("possibilites");
 
         boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
 
@@ -148,9 +139,9 @@ public class Game {
             for (int i = 0; i < numRows * numColumns; i++) {
                 if (!crossedOut.get(i)) {
                     if (!response && value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                        display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                        display.crossOutPicAuto(i, true);
                     } else if (response && !value.equals(pers.getAsJsonObject(String.valueOf(i)).get(property).getAsString())) {
-                        display.crossOutPicAuto(pers.getAsJsonObject(String.valueOf(i)).get("fichier").getAsString(), true);
+                        display.crossOutPicAuto(i, true);
                     }
                 }
             }

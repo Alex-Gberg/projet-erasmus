@@ -3,10 +3,12 @@ package com.example.projeterasmus;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -17,14 +19,26 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Menu {
+    ArrayList<String> characterSets = new ArrayList<>(List.of("original", "animaux"));
+
     public Menu(Stage stage) {
-       // Create 3 Buttons for new game, load game, quit game
+        // Create a dropdown menu to select which character set to use
+        ComboBox<String> characterSetSelector = new ComboBox<>(FXCollections.observableArrayList(characterSets));
+        characterSetSelector.setPromptText("Choisir le type de caractères");
+
+        // Create 3 Buttons for new game, load game, quit game
         Button newGameButton = new Button("Nouveau jeu");
         newGameButton.setId("round-green");
-        newGameButton.setOnAction(e -> new Game(stage, "jeux.json"));
+        newGameButton.setOnAction(e -> {
+            String selected = characterSetSelector.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                new Game(stage, selected + ".json");
+            }
+        });
 
         Button loadGameButton = new Button("Continuer la partie");
         loadGameButton.setId("round-yellow");
@@ -61,7 +75,7 @@ public class Menu {
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(350,0,133,80));
         buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(newGameButton, loadGameButton, quitGameButton);
+        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, quitGameButton);
 
         // Create Label
         Label tradeMarkLabel = new Label("@Qui-est-ce? - Groupe Erasmus");

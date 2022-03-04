@@ -33,7 +33,7 @@ public class Congratulations {
         Button playAgainButton = new Button("Rejouer");
         playAgainButton.setId("round-green");
         playAgainButton.setOnAction(e -> {
-            new MainMenu(mainStage);
+            new Menu(mainStage);
             congratulationStage.close();
         });
 

@@ -19,8 +19,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MainMenu {
-    public MainMenu(Stage stage) {
+public class Menu {
+    public Menu(Stage stage) {
        // Create 3 Buttons for new game, load game, quit game
         Button newGameButton = new Button("Nouveau jeu");
         newGameButton.setId("round-green");

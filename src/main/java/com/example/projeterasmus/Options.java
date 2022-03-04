@@ -11,8 +11,8 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class OptionsMenu {
-    public OptionsMenu(Stage mainStage, Game game) {
+public class Options {
+    public Options(Stage mainStage, Game game) {
         Stage optionsMenuStage = new Stage();
         optionsMenuStage.setResizable(false);
 
@@ -42,7 +42,7 @@ public class OptionsMenu {
         Button restartButton = new Button("Retour au menu");
         restartButton.setId("round-yellow");
         restartButton.setOnAction(e -> {
-            new MainMenu(mainStage);
+            new Menu(mainStage);
             optionsMenuStage.close();
         });
 

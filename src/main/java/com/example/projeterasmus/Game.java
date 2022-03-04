@@ -107,7 +107,7 @@ public class Game {
         constructGuesser();
 
         optionButton = new Button("Options");
-        optionButton.setOnAction(e -> new OptionsMenu(stage, this));
+        optionButton.setOnAction(e -> new Options(stage, this));
         autoMode = true;
         modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
         stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
@@ -167,7 +167,7 @@ public class Game {
 
     public void toggleMode() {
         autoMode = !autoMode;
-        modeLabel.setText("Mode: " + (autoMode ? "Automatic" : "Manual"));
+        modeLabel.setText("Mode: " + (autoMode ? "Automatique" : "Manuel"));
     }
 
     public void save() {

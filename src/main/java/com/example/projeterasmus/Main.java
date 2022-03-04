@@ -4,12 +4,12 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 
-public class Qui extends Application {
+public class Main extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Qui-est-ce? - Groupe Erasmus");
         stage.setResizable(false);
-        new MainMenu(stage);
+        new Menu(stage);
         stage.show();
     }
 

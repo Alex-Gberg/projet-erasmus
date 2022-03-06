@@ -16,9 +16,10 @@ Veuillez trouver ci-dessous les instructions pour lancer le jeu Qui-est-ce? réa
 4. Utiliser la commande `mvn clean javafx:run`
 
 ### Comment jouer
-- Appuyer sur le bouton `Nouveau jeu`
-- Utiliser les menus déroulants en bas de la fenêtre pour formuler vos questions
-- Appuyer sur `Interroger!` pour poser la question
+- Choisissez avec quel type de personnages vous voulez jouer
+- Appuyez sur le bouton `Nouveau jeu`
+- Utilisez les menus déroulants en bas de la fenêtre pour formuler vos questions
+- Appuyez sur `Interroger!` pour poser la question
 - Le jeu est en mode `Automatique` par défaut, alors les personnages non conformant à la réponse seront éliminer automatiquement
 - L'autre mode est `Manuel`. Dans cette mode vous recevrez les réponses à vos interrogations, mais vous serez obliger d'éliminer les personnages vous-mêmes en cliquant sur les images
 - Vous pouvez changer la mode depuis le bouton `Options` en haut de la fenêtre

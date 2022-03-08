@@ -30,7 +30,7 @@ public class Menu {
         ComboBox<String> characterSetSelector = new ComboBox<>(FXCollections.observableArrayList(characterSets));
         characterSetSelector.setPromptText("Choisir le type de caractères");
 
-        // Create 3 Buttons for new game, load game, quit game
+        // Create 4 Buttons for new game, load game, generate game, quit game
         Button newGameButton = new Button("Nouveau jeu");
         newGameButton.setId("round-green");
         newGameButton.setOnAction(e -> {
@@ -62,6 +62,19 @@ public class Menu {
             new Game(stage, root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
         });
 
+        // Create a dropdown menu to select which image set to use
+        ComboBox<String> imageSetSelector = new ComboBox<>(FXCollections.observableArrayList(characterSets));
+        imageSetSelector.setPromptText("Choisir les images");
+
+        Button generateButton = new Button("Générer un jeu");
+        generateButton.setId("round-green");
+        generateButton.setOnAction(e -> {
+            String selected = imageSetSelector.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                new Generator(stage, selected);
+            }
+        });
+
         Button quitGameButton = new Button("Quitter le jeu");
         quitGameButton.setId("round-red");
         quitGameButton.setOnAction(e -> stage.close());
@@ -75,7 +88,7 @@ public class Menu {
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(350,0,133,80));
         buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, quitGameButton);
+        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, imageSetSelector, generateButton, quitGameButton);
 
         // Create Label
         Label tradeMarkLabel = new Label("@Qui-est-ce? - Groupe Erasmus");

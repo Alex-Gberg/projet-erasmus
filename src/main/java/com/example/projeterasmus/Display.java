@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static java.lang.Math.sqrt;
 
  /*
    Display only displays the pictures.
@@ -32,10 +35,10 @@ public class Display {
     private int numRows;
     private int numColumns;
     private String imageFolder;
-    private VBox display;
-    private ArrayList<Node> nodes;
-    private ArrayList<HBox> rows;
+    private VBox display = new VBox();
+    private ArrayList<Node> nodes = new ArrayList<>();
 
+    // Create display based on a game/JSON
     public Display(Game game) {
         this.game = game;
         String path = "src/main/resources/JSON/" + game.getJsonName();
@@ -53,16 +56,27 @@ public class Display {
             e.printStackTrace();
         }
 
-        display = new VBox();
-        nodes = new ArrayList<>();
-        rows = new ArrayList<>();
-        loadPics();
+        loadPics(root);
 
-        fillRows(numRows, numColumns);
-        display.getChildren().setAll(rows);
+        display.getChildren().setAll(fillRows());
     }
 
-    private void loadPics() {
+    // Create display based on the name of a folder of images
+    public Display(String imageFolder) {
+        int numPics = loadPics(imageFolder);
+
+        int i = (int) sqrt(numPics);
+        while (i * (numPics/i) != numPics) {
+            i--;
+        }
+        numRows = i;
+        numColumns = numPics / numRows;
+
+        display.getChildren().setAll(fillRows());
+    }
+
+    // Load images based on a JSON
+    private int loadPics(JsonObject root) {
         JsonObject pers = root.getAsJsonObject("possibilites"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
@@ -74,10 +88,23 @@ public class Display {
             });
             nodes.add(imageView);
         }
+        return numRows*numColumns;
     }
 
-    private void fillRows(int numRows, int numColumns) {
-        rows.clear();
+    // Load images based on the contents of a folder
+    private int loadPics(String imageFolder) {
+        File folder = new File("src/main/resources/" + imageFolder);
+        int count = 0;
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
+            nodes.add(new ImageView(new Image(file.toURI().toString())));
+            count++;
+        }
+        return count;
+    }
+
+    // Make HBoxes based on the desired length of rows/columns
+    private ArrayList<HBox> fillRows() {
+        ArrayList<HBox> rows = new ArrayList<>();
         for (int i = 0; i < numRows; i++) {
             ArrayList<Node> row = new ArrayList<>();
             for (int j = 0; j < numColumns; j++) {
@@ -87,8 +114,10 @@ public class Display {
             rowBox.getChildren().addAll(row);
             rows.add(rowBox);
         }
+        return rows;
     }
 
+    // Cross out a picture based on its index
     public void crossOutPicAuto(int index, boolean updateCrossedOut) {
         String PNGName = root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
         Group crossedOut = crossOut(imageFolder + PNGName);
@@ -98,11 +127,11 @@ public class Display {
         });
 
         nodes.set(index, crossedOut);
-        fillRows(numRows, numColumns);
-        display.getChildren().setAll(rows);
+        display.getChildren().setAll(fillRows());
         if (updateCrossedOut) { game.toggleCrossedOut(index); }
     }
 
+    // Cross out a picture based on its object
     private void crossOutPicManual(Node node) {
         if (game.getAutoMode()) { return; }
         int index = nodes.indexOf(node);
@@ -129,11 +158,11 @@ public class Display {
         else {
             return;
         }
-        fillRows(numRows, numColumns);
-        display.getChildren().setAll(rows);
+        display.getChildren().setAll(fillRows());
         game.toggleCrossedOut(index);
     }
 
+    // Create the Group which consists of an image and an X over it
     private Group crossOut(String imagePath) {
         File file = new File(imagePath);
         ImageView bottom = new ImageView(new Image(file.toURI().toString()));

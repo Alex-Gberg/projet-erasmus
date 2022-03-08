@@ -1,0 +1,18 @@
+bentley - british - grey/ black - handbuilt luxus - signature engine
+bmw - german - white/ blue - all rounder - rwd - signature engine
+ferrari - italian - yellow - race/ track - high cylinder engines
+fiat - italian - red - compact - efficient engine
+ford - american - blue - muscle - high volume engines
+honda - japan - grey - high rpm - race/ track - vtec engines
+hyundai - korean - grey - rally - N engine
+jeep - american - black	- rock climbing - signature engine 
+lamborghini - italian - black/ gold - race/ track - high cylinder engines
+mazda - japan - grey - high rpm - rotary engine
+mini - british - black/ grey - compact
+nissan - japan - black - high rpm - race/ track/ drift - RB engines/ inline engine
+porsche - german - gold - race/ track- flat engine - gt3
+tesla - american - red - electric - autonomous
+toyota - japan - grey - high rpm - race/ track/ drift - JZ engines/ inline engine
+volvo - sweden - grey blue - efficient - compact - economic engine
+
+much more info can be added, just inform ali for it

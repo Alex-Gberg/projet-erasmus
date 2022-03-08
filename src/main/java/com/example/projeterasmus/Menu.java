@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Menu {
-    ArrayList<String> characterSets = new ArrayList<>(List.of("original", "animaux"));
+    ArrayList<String> characterSets = new ArrayList<>(List.of("original", "animaux", "pokemons", "cars"));
 
     public Menu(Stage stage) {
         // Create a dropdown menu to select which character set to use

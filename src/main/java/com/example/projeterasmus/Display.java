@@ -32,6 +32,7 @@ import static java.lang.Math.sqrt;
 public class Display {
     private Game game;
     private JsonObject root;
+    private int numPics;
     private int numRows;
     private int numColumns;
     private String imageFolder;
@@ -56,14 +57,14 @@ public class Display {
             e.printStackTrace();
         }
 
-        loadPics(root);
+        numPics = loadPics(root);
 
         display.getChildren().setAll(fillRows());
     }
 
     // Create display based on the name of a folder of images
     public Display(String imageFolder) {
-        int numPics = loadPics(imageFolder);
+        numPics = loadPics(imageFolder);
 
         int i = (int) sqrt(numPics);
         while (i * (numPics/i) != numPics) {
@@ -175,5 +176,13 @@ public class Display {
 
     public VBox getDisplay() {
         return display;
+    }
+
+    public int getNumPics() { return numPics; }
+
+    public void changeRowColumns(int newRows, int newColumns) {
+        numRows = newRows;
+        numColumns = newColumns;
+        display.getChildren().setAll(fillRows());
     }
 }

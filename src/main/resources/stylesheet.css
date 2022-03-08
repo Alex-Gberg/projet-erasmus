@@ -40,6 +40,19 @@
     -fx-pref-width: 200px;
 }
 
+#round-blue{
+    -fx-background-color:
+        linear-gradient(#e66465, #9198e5),
+        radial-gradient(center 50% -40%, radius 200%, #e66465 45%, #9198e5 50%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-pref-height: 28px;
+    -fx-pref-width: 200px;
+
+}
+
 #tradeMarkLabel{
     -fx-background-color: #EEEEEE;
         -fx-font-size: 10px;

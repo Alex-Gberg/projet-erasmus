@@ -1,5 +1,5 @@
 {
-  "images": "src/main/resources/animaux/",
+  "images": "src/main/resources/character_sets/animaux/",
   "ligne": 3,
   "column": 6,
   "possibilites": {

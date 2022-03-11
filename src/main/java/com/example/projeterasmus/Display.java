@@ -94,7 +94,7 @@ public class Display {
 
     // Load images based on the contents of a folder
     private int loadPics(String imageFolder) {
-        File folder = new File("src/main/resources/" + imageFolder);
+        File folder = new File("src/main/resources/character_sets/" + imageFolder);
         int count = 0;
         for (File file : Objects.requireNonNull(folder.listFiles())) {
             nodes.add(new ImageView(new Image(file.toURI().toString())));

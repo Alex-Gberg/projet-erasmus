@@ -16,18 +16,21 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Menu {
-    ArrayList<String> characterSets = new ArrayList<>(List.of("original", "animaux", "pokemons", "cars"));
-
     public Menu(Stage stage) {
         // Create a dropdown menu to select which character set to use
-        ComboBox<String> characterSetSelector = new ComboBox<>(FXCollections.observableArrayList(characterSets));
+        ArrayList<String> playableGames = new ArrayList<>(Arrays.asList(Objects.requireNonNull(new File("src/main/resources/JSON").list())));
+        for (int i = 0; i < playableGames.size(); i++) {
+            playableGames.set(i, playableGames.get(i).substring(0, playableGames.get(i).length()-5));
+        }
+        ComboBox<String> characterSetSelector = new ComboBox<>(FXCollections.observableArrayList(playableGames));
         characterSetSelector.setPromptText("Choisir le type de caractères");
 
         // Create 4 Buttons for new game, load game, generate game, quit game
@@ -45,7 +48,7 @@ public class Menu {
         loadGameButton.setOnAction(e -> {
             BufferedReader bufferedReader = null;
             try {
-                bufferedReader = new BufferedReader(new FileReader("src/main/resources/JSON/save.json"));
+                bufferedReader = new BufferedReader(new FileReader("src/main/resources/save.json"));
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
             }
@@ -63,7 +66,7 @@ public class Menu {
         });
 
         // Create a dropdown menu to select which image set to use
-        ComboBox<String> imageSetSelector = new ComboBox<>(FXCollections.observableArrayList(characterSets));
+        ComboBox<String> imageSetSelector = new ComboBox<>(FXCollections.observableArrayList(new File("src/main/resources/character_sets").list()));
         imageSetSelector.setPromptText("Choisir les images");
 
         Button generateButton = new Button("Générer un jeu");

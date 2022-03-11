@@ -19,7 +19,7 @@ public class Save {
     }
 
     public void saveToFile() {
-        try (Writer writer = new FileWriter("src/main/resources/JSON/save.json")) {
+        try (Writer writer = new FileWriter("src/main/resources/save.json")) {
             Gson gson = new GsonBuilder().create();
             gson.toJson(this, writer);
         }

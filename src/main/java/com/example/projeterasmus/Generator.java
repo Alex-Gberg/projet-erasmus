@@ -15,6 +15,9 @@ public class Generator {
     private final int numPics;
 
     public Generator(Stage stage, String imageFolder) {
+        Button optionButton = new Button("Options");
+        optionButton.setOnAction(e -> new Options(stage).showOptions());
+
         Display display = new Display(imageFolder);
         numPics = display.getNumPics();
 
@@ -46,8 +49,11 @@ public class Generator {
         });
 
         ObservableList<String> attributeList = FXCollections.observableArrayList();
+        ListView<String> attributeListView = new ListView<>(attributeList);
+
         TextField attributeInput = new TextField();
         attributeInput.setPromptText("Saisir un attribut");
+
         Button addAttribute = new Button("Ajouter");
         addAttribute.setOnAction(e -> {
             String text = attributeInput.getText();
@@ -55,15 +61,17 @@ public class Generator {
                 attributeList.add(text);
             }
             attributeInput.clear();
+            attributeListView.getSelectionModel().clearSelection();
         });
 
-        ListView<String> attributeListView = new ListView<>(attributeList);
-
         Button removeAttribute = new Button("Supprimer");
-        removeAttribute.setOnAction(e -> attributeList.remove(attributeListView.getSelectionModel().getSelectedItem()) );
-
+        removeAttribute.setOnAction(e -> {
+            attributeList.remove(attributeListView.getSelectionModel().getSelectedItem());
+            attributeListView.getSelectionModel().clearSelection();
+        });
 
         stage.setScene(new Scene(new VBox(
+                                    optionButton,
                                     new HBox(
                                         new VBox(rowInputLabel, rowInput),
                                         new VBox(columnInputLabel, columnInput),

@@ -12,18 +12,54 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class Options {
-    public Options(Stage mainStage, Game game) {
-        Stage optionsMenuStage = new Stage();
+    Stage optionsMenuStage;
+    BorderPane borderPane;
+    VBox buttonsBox;
+    Button resumeButton;
+    Button toMenuButton;
+    Button quitButton;
+
+    public Options(Stage mainStage) {
+        optionsMenuStage = new Stage();
         optionsMenuStage.setResizable(false);
+        optionsMenuStage.setTitle("Options");
 
-        // Create label
-        Label infoLabel = new Label();
-        infoLabel.setStyle("-fx-text-fill:WHITE;");
+        buttonsBox = new VBox();
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.setPadding(new Insets(10,10,10,10));
+        buttonsBox.setSpacing(10);
 
-        // Create 4 Buttons for Resume, Change mode, Save, Restart, Quit
-        Button resumeButton = new Button("Reprendre");
+        borderPane = new BorderPane();
+        borderPane.setCenter(buttonsBox);
+        borderPane.setId("backgroundBlack");
+        borderPane.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+
+        resumeButton = new Button("Reprendre");
         resumeButton.setId("round-green");
         resumeButton.setOnAction(e -> optionsMenuStage.close());
+
+        toMenuButton = new Button("Retour au menu");
+        toMenuButton.setId("round-yellow");
+        toMenuButton.setOnAction(e -> {
+            new Menu(mainStage);
+            optionsMenuStage.close();
+        });
+
+        quitButton = new Button("Quitter");
+        quitButton.setId("round-red");
+        quitButton.setOnAction(e -> {
+            mainStage.close();
+            optionsMenuStage.close();
+        });
+
+        buttonsBox.getChildren().setAll(resumeButton, toMenuButton, quitButton);
+    }
+
+    public Options(Stage mainStage, Game game) {
+        this(mainStage);
+
+        Label infoLabel = new Label();
+        infoLabel.setStyle("-fx-text-fill:WHITE;");
 
         Button modeButton = new Button("Changer de mode");
         modeButton.setId("round-green");
@@ -39,35 +75,11 @@ public class Options {
             infoLabel.setText("Enregistré avec succès!");
         });
 
-        Button restartButton = new Button("Retour au menu");
-        restartButton.setId("round-yellow");
-        restartButton.setOnAction(e -> {
-            new Menu(mainStage);
-            optionsMenuStage.close();
-        });
+        buttonsBox.getChildren().setAll(resumeButton, modeButton, saveButton, toMenuButton, quitButton, infoLabel);
+    }
 
-        Button quitButton = new Button("Quitter le jeu");
-        quitButton.setId("round-red");
-        quitButton.setOnAction(e -> {
-            mainStage.close();
-            optionsMenuStage.close();
-        });
-
-        // Put buttons VBox and Borderpane
-        VBox buttonsBox = new VBox();
-        buttonsBox.setAlignment(Pos.CENTER);
-        buttonsBox.setPadding(new Insets(10,10,10,10));
-        buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(resumeButton, modeButton, saveButton, restartButton, quitButton, infoLabel);
-
-        //BorderPane
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(buttonsBox);
-        borderPane.setId("backgroundBlack");
-
-        borderPane.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+    public void showOptions() {
         optionsMenuStage.setScene(new Scene(borderPane));
-        optionsMenuStage.setTitle("Options");
         optionsMenuStage.show();
     }
 }

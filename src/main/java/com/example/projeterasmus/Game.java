@@ -97,7 +97,7 @@ public class Game {
         constructGuesser();
 
         optionButton = new Button("Options");
-        optionButton.setOnAction(e -> new Options(stage, this));
+        optionButton.setOnAction(e -> new Options(stage, this).showOptions());
         autoMode = true;
         modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
 

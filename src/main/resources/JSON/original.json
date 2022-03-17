@@ -1,7 +1,7 @@
 {
       "images": "src/main/resources/character_sets/original/",
       "ligne": 3,
-      "column": 8,
+      "colonne": 8,
       "possibilites": {
             "0": {"fichier": "Samuel.png",
                   "nom": "Samuel",

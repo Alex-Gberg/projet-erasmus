@@ -1,5 +1,6 @@
 package com.example.projeterasmus;
 
+import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -11,15 +12,31 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.util.*;
+
 public class Generator {
     private final int numPics;
+    private int numRows;
+    private int numColumns;
+    private final String imageFolder;
+    private ObservableList<String> attributeList;
+    private TreeMap<String, HashMap<String, String>> possibilites;
 
     public Generator(Stage stage, String imageFolder) {
+        // for testing only
+        Button testJson = new Button("Make JSON (test)");
+        testJson.setOnAction(e -> makeJSON());
+
+        this.imageFolder = imageFolder;
+
         Button optionButton = new Button("Options");
         optionButton.setOnAction(e -> new Options(stage).showOptions());
 
         Display display = new Display(imageFolder);
         numPics = display.getNumPics();
+        numRows = display.getNumRowsCols()[0];
+        numColumns = display.getNumRowsCols()[1];
 
         Label rowInputLabel = new Label("Nombre de Lignes:");
         TextField rowInput = new TextField();
@@ -37,6 +54,8 @@ public class Generator {
                 if (desiredRows * desiredCols == numPics) {
                     display.changeRowColumns(desiredRows, desiredCols);
                     infoLabel.setText("Grille est de taille " + desiredRows + "x" + desiredCols);
+                    numRows = desiredRows;
+                    numColumns = desiredCols;
                 }
                 else {
                     infoLabel.setText("Entrée invalide");
@@ -48,7 +67,7 @@ public class Generator {
             columnInput.clear();
         });
 
-        ObservableList<String> attributeList = FXCollections.observableArrayList();
+        attributeList = FXCollections.observableArrayList();
         ListView<String> attributeListView = new ListView<>(attributeList);
 
         TextField attributeInput = new TextField();
@@ -56,8 +75,8 @@ public class Generator {
 
         Button addAttribute = new Button("Ajouter");
         addAttribute.setOnAction(e -> {
-            String text = attributeInput.getText();
-            if (text.length() != 0) {
+            String text = attributeInput.getText().toLowerCase();
+            if (text.length() != 0 && !attributeList.contains(text)) {
                 attributeList.add(text);
             }
             attributeInput.clear();
@@ -70,16 +89,55 @@ public class Generator {
             attributeListView.getSelectionModel().clearSelection();
         });
 
+        Button saveAttributes = new Button("Valider");
+        saveAttributes.setOnAction(e -> {
+            instantiatePossibilites();
+            // remove listview and replace with some kind of way of filling in attribute values (highlight which image is being filled?)
+        });
+
         stage.setScene(new Scene(new VBox(
-                                    optionButton,
-                                    new HBox(
-                                        new VBox(rowInputLabel, rowInput),
-                                        new VBox(columnInputLabel, columnInput),
-                                        new VBox(infoLabel, validateRowColumnButton)
-                                    ),
-                                    display.getDisplay(),
-                                    new HBox(attributeInput, addAttribute, removeAttribute),
-                                    attributeListView
-                            )));
+                                        optionButton,
+                                        new HBox(
+                                            new VBox(rowInputLabel, rowInput),
+                                            new VBox(columnInputLabel, columnInput),
+                                            new VBox(infoLabel, validateRowColumnButton)
+                                        ),
+                                        display.getDisplay(),
+                                        new HBox(attributeInput, addAttribute, removeAttribute),
+                                        attributeListView,
+                                        new HBox(saveAttributes, testJson)
+                                )));
+    }
+
+    private void instantiatePossibilites() {
+        possibilites = new TreeMap<>(Comparator.comparingInt(Integer::parseInt)); // TreeMap sorts the map items by key value
+        File folder = new File("src/main/resources/character_sets/" + imageFolder);
+        int i = 0;
+        for (File file : Objects.requireNonNull(folder.listFiles())) {
+            HashMap<String, String> attributes = new LinkedHashMap<>(); // LinkedHashMap keeps the order that key/values were inserted
+            attributes.put("fichier", file.getName());
+            attributes.put("nom", "");
+            for (String attribute : attributeList) {
+                attributes.put(attribute, "");
+            }
+            possibilites.put(String.valueOf(i), attributes);
+            i++;
+        }
+
+        System.out.println(possibilites);
+    }
+
+    private void makeJSON() {
+        Gson gson = new Gson();
+
+        HashMap<String, ? super Object> generatorMap = new HashMap<>();
+        generatorMap.put("images", "src/main/resources/character_sets/" + imageFolder + "/");
+        generatorMap.put("ligne", String.valueOf(numRows));
+        generatorMap.put("colonne", String.valueOf(numColumns));
+        generatorMap.put("possibilites", possibilites);
+
+        // validateJSON() -> validate before saving
+
+        System.out.println(gson.toJson(generatorMap));
     }
 }

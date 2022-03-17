@@ -75,7 +75,7 @@ public class Game {
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
             root = json.getAsJsonObject();
             numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("column").getAsInt();
+            numColumns = root.get("colonne").getAsInt();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -1,7 +1,7 @@
 {
   "images": "src/main/resources/character_sets/animaux/",
   "ligne": 3,
-  "column": 6,
+  "colonne": 6,
   "possibilites": {
     "0": {"fichier": "aigle.png",
       "nom": "aigle",

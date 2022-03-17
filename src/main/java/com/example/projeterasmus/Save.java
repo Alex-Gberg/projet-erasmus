@@ -1,7 +1,6 @@
 package com.example.projeterasmus;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.FileWriter;
 import java.io.Writer;
@@ -20,7 +19,7 @@ public class Save {
 
     public void saveToFile() {
         try (Writer writer = new FileWriter("src/main/resources/save.json")) {
-            Gson gson = new GsonBuilder().create();
+            Gson gson = new Gson();
             gson.toJson(this, writer);
         }
         catch (Exception exc) {

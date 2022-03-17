@@ -50,7 +50,7 @@ public class Display {
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
             root = json.getAsJsonObject();
             numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("column").getAsInt();
+            numColumns = root.get("colonne").getAsInt();
             imageFolder = root.get("images").getAsString(); //Path to imageFolder
         }
         catch (FileNotFoundException e) {
@@ -179,6 +179,8 @@ public class Display {
     }
 
     public int getNumPics() { return numPics; }
+
+    public int[] getNumRowsCols() { return new int[]{ numRows, numColumns}; }
 
     public void changeRowColumns(int newRows, int newColumns) {
         numRows = newRows;

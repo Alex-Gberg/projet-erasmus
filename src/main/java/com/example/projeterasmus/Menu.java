@@ -46,23 +46,22 @@ public class Menu {
         Button loadGameButton = new Button("Continuer la partie");
         loadGameButton.setId("round-yellow");
         loadGameButton.setOnAction(e -> {
-            BufferedReader bufferedReader = null;
             try {
-                bufferedReader = new BufferedReader(new FileReader("src/main/resources/save.json"));
+                BufferedReader bufferedReader = new BufferedReader(new FileReader("src/main/resources/save.json"));
+                Gson gson = new Gson();
+                JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
+                JsonObject root = json.getAsJsonObject();
+
+                ArrayList<Boolean> crossedOut = new ArrayList<>();
+                for (JsonElement o : root.get("crossedOut").getAsJsonArray()) {
+                    crossedOut.add(o.getAsBoolean());
+                }
+
+                new Game(stage, root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
+
             } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
+                System.out.println("Cannot continue game: no save file currently exists");
             }
-
-            Gson gson = new Gson();
-            JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
-            JsonObject root = json.getAsJsonObject();
-
-            ArrayList<Boolean> crossedOut = new ArrayList<>();
-            for (JsonElement o : root.get("crossedOut").getAsJsonArray()) {
-                crossedOut.add(o.getAsBoolean());
-            }
-
-            new Game(stage, root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
         });
 
         // Create a dropdown menu to select which image set to use

@@ -26,12 +26,14 @@ public class Generator {
 
     private final Button optionButton;
     private final Display display;
+    private final Node fileNamer;
     private final Node gridSizer;
     private final Node attributesInputter;
     private final Button proceedToAttributeValueInput; // Could use a better variable name
     private Node attributeValuesInputter;
     private int currentImageIndex;
 
+    private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
     private ObservableList<String> attributeList;
     private TreeMap<String, HashMap<String, String>> possibilites;
 
@@ -46,6 +48,7 @@ public class Generator {
         numRows = display.getNumRowsCols()[0];
         numColumns = display.getNumRowsCols()[1];
 
+        fileNamer = makeFileNamer();
         gridSizer = makeGridSizer();
         attributesInputter = makeAttributeGetter();
 
@@ -60,7 +63,7 @@ public class Generator {
         setInitialStage();
     }
 
-    // Returns a "widget" which allows the user to adjust the grid size
+    // Returns a "widget" for adjusting the grid size
     private Node makeGridSizer() {
         Label rowInputLabel = new Label("Nombre de Lignes:");
         TextField rowInput = new TextField();
@@ -82,7 +85,7 @@ public class Generator {
                     infoLabel.setText("Grille est de taille " + desiredRows + "x" + desiredCols);
                     numRows = desiredRows;
                     numColumns = desiredCols;
-                    setInitialStage();
+                    stage.sizeToScene();
                 }
                 else {
                     infoLabel.setText("Entrée invalide");
@@ -104,6 +107,7 @@ public class Generator {
         );
     }
 
+    // Returns a "widget" for inputting the list of attributes
     private Node makeAttributeGetter() {
         attributeList = FXCollections.observableArrayList();
         ListView<String> attributeListView = new ListView<>(attributeList);
@@ -136,6 +140,7 @@ public class Generator {
         );
     }
 
+    // Returns a "widget" for inputting the values of each attribute
     private Node makeAttributeValuesInputter() {
         Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
 
@@ -155,14 +160,16 @@ public class Generator {
                 infoLabel.setText("Remplir tous les champs!");
             }
             else {
-                imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
+                textFieldMap.get("nom").clear();
+                for (String attribute : attributeList) {
+                    textFieldMap.get(attribute).clear();
+                }
+                imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (++currentImageIndex + 1));
                 if (currentImageIndex >= (numRows * numColumns)) {
-                    saveJSON(makeGeneratorMap());
                     setEndStage();
                 }
             }
         });
-
 
         VBox form = new VBox(imageIndicator);
         form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
@@ -174,8 +181,14 @@ public class Generator {
         return form;
     }
 
+    // Takes the info from the makeAttributeValuesInputter, checks validity and inserts the values into the possiblites map
     private int processAttributeValueInput(HashMap<String, TextField> textFieldMap) {
-        possibilites.get(String.valueOf(currentImageIndex)).replace("nom", textFieldMap.get("nom").getText());
+        String nom = textFieldMap.get("nom").getText().strip().toLowerCase();
+        if (nom.length() == 0) {
+            textFieldMap.get("nom").clear();
+            return -1;
+        }
+        possibilites.get(String.valueOf(currentImageIndex)).replace("nom", nom);
         for (String attribute : attributeList) {
             String userInput = textFieldMap.get(attribute).getText().strip().toLowerCase();
             if (userInput.length() == 0) {
@@ -184,14 +197,34 @@ public class Generator {
             }
             possibilites.get(String.valueOf(currentImageIndex)).replace(attribute, userInput);
         }
-
-        textFieldMap.get("nom").clear();
-        for (String attribute : attributeList) {
-            textFieldMap.get(attribute).clear();
-        }
-
-        currentImageIndex++;
         return 1;
+    }
+
+    // Returns a "widget" for naming the file
+    private Node makeFileNamer() {
+        TextField fileNameInput = new TextField(imageFolder + "_a_vous");
+        Button saveButton = new Button("Enregistrer");
+        Label infoLabel = new Label();
+        saveButton.setOnAction(e -> {
+            String proposedName = fileNameInput.getText().strip();
+            for (CharSequence c : ILLEGAL_CHARACTERS) {
+                if (proposedName.contains(c)) {
+                    infoLabel.setText(proposedName + " n'est pas un nom de fichier valide!\n Il contient: " + c);
+                    stage.sizeToScene();
+                    return;
+                }
+            }
+            saveJSON(makeGeneratorMap(), proposedName);
+            fileNameInput.setEditable(false);
+            saveButton.setDisable(true);
+            infoLabel.setText("Enregistré avec succès sous: " + proposedName);
+        });
+
+        return new VBox(
+                new Label("Nommer le fichier: "),
+                new HBox(fileNameInput, saveButton),
+                infoLabel
+        );
     }
 
     private void setInitialStage() {
@@ -215,8 +248,11 @@ public class Generator {
     private void setEndStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
-                display.getDisplay()
+                display.getDisplay(),
+                fileNamer
         )));
+
+
     }
 
     // possibilites is the Map which contains the information of each character
@@ -249,8 +285,8 @@ public class Generator {
         return generatorMap;
     }
 
-    private void saveJSON(HashMap<String, ? super Object> generatorMap) {
-        try (Writer writer = new FileWriter("src/main/resources/JSON/" + imageFolder + "_user_made.json")) {
+    private void saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) {
+        try (Writer writer = new FileWriter("src/main/resources/JSON/" + fileName + ".json")) {
             Gson gson = new Gson();
             gson.toJson(generatorMap, writer);
         }

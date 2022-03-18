@@ -14,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.*;
 
 public class Generator {
@@ -28,6 +30,7 @@ public class Generator {
     private final Node attributesInputter;
     private final Button proceedToAttributeValueInput; // Could use a better variable name
     private Node attributeValuesInputter;
+    private int currentImageIndex;
 
     private ObservableList<String> attributeList;
     private TreeMap<String, HashMap<String, String>> possibilites;
@@ -112,7 +115,7 @@ public class Generator {
 
         Button addAttribute = new Button("Ajouter");
         addAttribute.setOnAction(e -> {
-            String text = attributeInput.getText().toLowerCase();
+            String text = attributeInput.getText().strip().toLowerCase();
             if (text.length() != 0 && !attributeList.contains(text)) {
                 attributeList.add(text);
             }
@@ -134,39 +137,61 @@ public class Generator {
     }
 
     private Node makeAttributeValuesInputter() {
-        Label imageIndicator = new Label();
+        Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
 
-        // use a map from label to textfield
+        HashMap<String, TextField> textFieldMap = new HashMap<>();
 
-        ArrayList<Label> formLabels = new ArrayList<>();
-        ArrayList<TextField> formTextFields = new ArrayList<>();
-
-        formLabels.add(new Label("nom: "));
-        formTextFields.add(new TextField());
+        textFieldMap.put("nom", new TextField());
 
         for (String attribute : attributeList) {
-            formLabels.add(new Label(attribute + ": "));
-            formTextFields.add(new TextField());
+            textFieldMap.put(attribute, new TextField());
         }
 
-        Button nextImage = new Button("Valider");
-        nextImage.setOnAction(e -> {
-            processAttributeValueInput(formTextFields, 0);
+        Button nextImageButton = new Button("Valider");
+        Label infoLabel = new Label();
+        nextImageButton.setOnAction(e -> {
+            int res = processAttributeValueInput(textFieldMap);
+            if (res < 0) {
+                infoLabel.setText("Remplir tous les champs!");
+            }
+            else {
+                imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
+                if (currentImageIndex >= (numRows * numColumns)) {
+                    saveJSON(makeGeneratorMap());
+                    setEndStage();
+                }
+            }
         });
 
+
         VBox form = new VBox(imageIndicator);
-
-        for (int i = 0; i < formLabels.size(); i++) {
-            form.getChildren().add(new HBox(formLabels.get(i), formTextFields.get(i)));
+        form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
+        for (String attribute : attributeList) {
+            form.getChildren().add(new HBox(new Label(attribute + ": "), textFieldMap.get(attribute)));
         }
-
-        form.getChildren().add(nextImage);
+        form.getChildren().add(new HBox(nextImageButton, infoLabel));
 
         return form;
     }
 
-    private void processAttributeValueInput(ArrayList<TextField> formTextFields, int imageIndex) {
-        // TODO
+    private int processAttributeValueInput(HashMap<String, TextField> textFieldMap) {
+        possibilites.get(String.valueOf(currentImageIndex)).replace("nom", textFieldMap.get("nom").getText());
+        for (String attribute : attributeList) {
+            String userInput = textFieldMap.get(attribute).getText().strip().toLowerCase();
+            if (userInput.length() == 0) {
+                textFieldMap.get(attribute).clear();
+                return -1;
+            }
+            possibilites.get(String.valueOf(currentImageIndex)).replace(attribute, userInput);
+        }
+
+        textFieldMap.get("nom").clear();
+        for (String attribute : attributeList) {
+            textFieldMap.get(attribute).clear();
+        }
+
+        currentImageIndex++;
+        return 1;
     }
 
     private void setInitialStage() {
@@ -187,6 +212,13 @@ public class Generator {
         )));
     }
 
+    private void setEndStage() {
+        stage.setScene(new Scene(new VBox(
+                optionButton,
+                display.getDisplay()
+        )));
+    }
+
     // possibilites is the Map which contains the information of each character
     private void instantiatePossibilites() {
         possibilites = new TreeMap<>(Comparator.comparingInt(Integer::parseInt)); // TreeMap sorts the map items by key value
@@ -203,20 +235,27 @@ public class Generator {
             i++;
         }
 
-        System.out.println(possibilites);
     }
 
-    private void makeJSON() {
-        Gson gson = new Gson();
-
+    private HashMap<String, ? super Object> makeGeneratorMap() {
         HashMap<String, ? super Object> generatorMap = new HashMap<>();
         generatorMap.put("images", "src/main/resources/character_sets/" + imageFolder + "/");
         generatorMap.put("ligne", String.valueOf(numRows));
         generatorMap.put("colonne", String.valueOf(numColumns));
         generatorMap.put("possibilites", possibilites);
 
-        // TODO validateJSON() -> validate before saving
+        // TODO validatePossibilites() -> validate before saving
 
-        System.out.println(gson.toJson(generatorMap));
+        return generatorMap;
+    }
+
+    private void saveJSON(HashMap<String, ? super Object> generatorMap) {
+        try (Writer writer = new FileWriter("src/main/resources/JSON/" + imageFolder + "_user_made.json")) {
+            Gson gson = new Gson();
+            gson.toJson(generatorMap, writer);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -52,10 +52,9 @@ public class Generator {
             instantiatePossibilites();
             attributeValuesInputter = makeAttributeValuesInputter();
             setValueInputStage();
-            // remove listview and replace with some kind of way of filling in attribute values (highlight which image is being filled?)
         });
 
-        setInitialSage();
+        setInitialStage();
     }
 
     // Returns a "widget" which allows the user to adjust the grid size
@@ -80,6 +79,7 @@ public class Generator {
                     infoLabel.setText("Grille est de taille " + desiredRows + "x" + desiredCols);
                     numRows = desiredRows;
                     numColumns = desiredCols;
+                    setInitialStage();
                 }
                 else {
                     infoLabel.setText("Entrée invalide");
@@ -134,25 +134,42 @@ public class Generator {
     }
 
     private Node makeAttributeValuesInputter() {
-        ArrayList<HBox> formItems = new ArrayList<>();
-        formItems.add(new HBox(new Label("nom: "), new TextField()));
+        Label imageIndicator = new Label();
+
+        // use a map from label to textfield
+
+        ArrayList<Label> formLabels = new ArrayList<>();
+        ArrayList<TextField> formTextFields = new ArrayList<>();
+
+        formLabels.add(new Label("nom: "));
+        formTextFields.add(new TextField());
+
         for (String attribute : attributeList) {
-            formItems.add(new HBox(new Label(attribute + ": "), new TextField()));
+            formLabels.add(new Label(attribute + ": "));
+            formTextFields.add(new TextField());
         }
-        final int imageIndex = 0;
-        Label imageIndicator = new Label("Saisir les valeurs pour image #" + imageIndex);
-        VBox form = new VBox(imageIndicator);
-        form.getChildren().addAll(formItems);
+
         Button nextImage = new Button("Valider");
         nextImage.setOnAction(e -> {
-            // TODO process input data
+            processAttributeValueInput(formTextFields, 0);
         });
+
+        VBox form = new VBox(imageIndicator);
+
+        for (int i = 0; i < formLabels.size(); i++) {
+            form.getChildren().add(new HBox(formLabels.get(i), formTextFields.get(i)));
+        }
+
         form.getChildren().add(nextImage);
 
         return form;
     }
 
-    private void setInitialSage() {
+    private void processAttributeValueInput(ArrayList<TextField> formTextFields, int imageIndex) {
+        // TODO
+    }
+
+    private void setInitialStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
                 display.getDisplay(),
@@ -198,7 +215,7 @@ public class Generator {
         generatorMap.put("colonne", String.valueOf(numColumns));
         generatorMap.put("possibilites", possibilites);
 
-        // validateJSON() -> validate before saving
+        // TODO validateJSON() -> validate before saving
 
         System.out.println(gson.toJson(generatorMap));
     }

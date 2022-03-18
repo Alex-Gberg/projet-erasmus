@@ -66,11 +66,10 @@ public class Display {
     public Display(String imageFolder) {
         numPics = loadPics(imageFolder);
 
-        int i = (int) sqrt(numPics);
-        while (i * (numPics/i) != numPics) {
-            i--;
+        numRows = (int) sqrt(numPics);
+        while (numRows * (numPics/numRows) != numPics) {
+            numRows--;
         }
-        numRows = i;
         numColumns = numPics / numRows;
 
         display.getChildren().setAll(fillRows());
@@ -177,8 +176,6 @@ public class Display {
     public VBox getDisplay() {
         return display;
     }
-
-    public int getNumPics() { return numPics; }
 
     public int[] getNumRowsCols() { return new int[]{ numRows, numColumns}; }
 

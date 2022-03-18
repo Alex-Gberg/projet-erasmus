@@ -8,7 +8,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Qui-est-ce? - Groupe Erasmus");
-//        stage.setResizable(false);
+        stage.setResizable(false);
         new Menu(stage);
         stage.show();
     }

@@ -278,8 +278,8 @@ public class Generator {
         generatorMap.put("possibilites", possibilites);
 
         if (!validatePossibilites(generatorMap)){
-            System.out.println("GeneratorMap could not be made! Try again.");
-            // TODO If validatePossibilites() returns false, the generatorMap will not be created.
+            System.out.println("GeneratorMap could not be made! Return to Menu.");
+            new Menu(stage);
         }
         return generatorMap;
     }
@@ -297,7 +297,7 @@ public class Generator {
                 String hashMap1Name = hashMap1.get("nom");
                 String hashMap2Name = hashMap2.get("nom");
                 if (hashMap1Name.equals(hashMap2Name)) {
-                    String errorMessage = "Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom!";
+                    String errorMessage = "Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom! Le jeu se termine! Retour au menu!";
                     alert(errorMessage);
                     return false;
                 }
@@ -314,7 +314,7 @@ public class Generator {
                 hashMap1.remove("nom");
                 hashMap2.remove("nom");
                 if (hashMap1.equals(hashMap2)){
-                    String errorMessage = "Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer!";
+                    String errorMessage = "Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer! Le jeu se termine! Retour au menu!";
                     alert(errorMessage);
                     return false;
                 }

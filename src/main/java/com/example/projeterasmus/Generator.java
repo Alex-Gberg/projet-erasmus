@@ -204,7 +204,7 @@ public class Generator {
         Label infoLabel = new Label();
         saveButton.setOnAction(e -> {
             String proposedName = fileNameInput.getText().strip();
-            for (CharSequence c : ILLEGAL_CHARACTERS) {
+            for (CharSequence c : ILLEGAL_CHARACTERS) { // TODO check for an existing file of the same name to warn of overwriting?
                 if (proposedName.contains(c)) {
                     infoLabel.setText(proposedName + " n'est pas un nom de fichier valide!\n Il contient: " + c);
                     stage.sizeToScene();
@@ -280,42 +280,33 @@ public class Generator {
         if (!validatePossibilites(generatorMap)){
             System.out.println("GeneratorMap could not be made! Return to Menu.");
             new Menu(stage);
+            return null;
         }
         return generatorMap;
     }
 
     private Boolean validatePossibilites(HashMap<String, ? super Object> generatorMap) {
-        System.out.println(generatorMap);
-        System.out.println("Access Possibilities + Print out");
-        System.out.println(possibilites);
-
         //Check first that the Attribute Nom for each PNG is different
-        for(int i=0; i < possibilites.size(); i++){
-            for(int j= i + 1; j < possibilites.size(); j++) {
-                HashMap<String, String> hashMap1 = possibilites.get(Integer.toString(i));
-                HashMap<String, String> hashMap2 = possibilites.get(Integer.toString(j));
-                String hashMap1Name = hashMap1.get("nom");
-                String hashMap2Name = hashMap2.get("nom");
-                if (hashMap1Name.equals(hashMap2Name)) {
-                    String errorMessage = "Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom! Le jeu se termine! Retour au menu!";
-                    alert(errorMessage);
+        for (int i = 0; i < possibilites.size() - 1; i++){
+            for (int j = i + 1; j < possibilites.size(); j++) {
+                if (possibilites.get(String.valueOf(i)).get("nom").equals(possibilites.get(String.valueOf(j)).get("nom"))) {
+                    alert("Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom! Le jeu se termine! Retour au menu!");
                     return false;
                 }
             }
         }
 
         //Make sure that no 2 characters have exactly the same attribute set
-        for(int i=0; i < possibilites.size(); i++){
-            for(int j= i + 1; j < possibilites.size(); j++){
-                HashMap<String, String> hashMap1 = possibilites.get(Integer.toString(i));
-                HashMap<String, String> hashMap2 = possibilites.get(Integer.toString(j));
-                hashMap1.remove("fichier");
-                hashMap2.remove("fichier");
-                hashMap1.remove("nom");
-                hashMap2.remove("nom");
-                if (hashMap1.equals(hashMap2)){
-                    String errorMessage = "Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer! Le jeu se termine! Retour au menu!";
-                    alert(errorMessage);
+        for (int i = 0; i < possibilites.size() - 1; i++){
+            for (int j = i + 1; j < possibilites.size(); j++){
+                HashMap<String, String> iAttributes = new HashMap<>(possibilites.get(Integer.toString(i)));
+                HashMap<String, String> jAttributes = new HashMap<>(possibilites.get(Integer.toString(j)));
+                iAttributes.remove("fichier");
+                iAttributes.remove("nom");
+                jAttributes.remove("fichier");
+                jAttributes.remove("nom");
+                if (iAttributes.equals(jAttributes)){
+                    alert("Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer! Le jeu se termine! Retour au menu!");
                     return false;
                 }
             }
@@ -333,6 +324,10 @@ public class Generator {
     }
 
     private void saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) {
+        if (generatorMap == null) {
+            return;
+        }
+
         try (Writer writer = new FileWriter("src/main/resources/JSON/" + fileName + ".json")) {
             Gson gson = new Gson();
             gson.toJson(generatorMap, writer);

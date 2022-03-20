@@ -70,7 +70,6 @@ public class Game {
         String path = "src/main/resources/JSON/" + jsonName;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
-
             Gson gson = new Gson();
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
             root = json.getAsJsonObject();

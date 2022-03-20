@@ -5,10 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -280,9 +277,59 @@ public class Generator {
         generatorMap.put("colonne", String.valueOf(numColumns));
         generatorMap.put("possibilites", possibilites);
 
-        // TODO validatePossibilites() -> validate before saving
-
+        if (!validatePossibilites(generatorMap)){
+            System.out.println("GeneratorMap could not be made! Try again.");
+            // TODO If validatePossibilites() returns false, the generatorMap will not be created.
+        }
         return generatorMap;
+    }
+
+    private Boolean validatePossibilites(HashMap<String, ? super Object> generatorMap) {
+        System.out.println(generatorMap);
+        System.out.println("Access Possibilities + Print out");
+        System.out.println(possibilites);
+
+        //Check first that the Attribute Nom for each PNG is different
+        for(int i=0; i < possibilites.size(); i++){
+            for(int j= i + 1; j < possibilites.size(); j++) {
+                HashMap<String, String> hashMap1 = possibilites.get(Integer.toString(i));
+                HashMap<String, String> hashMap2 = possibilites.get(Integer.toString(j));
+                String hashMap1Name = hashMap1.get("nom");
+                String hashMap2Name = hashMap2.get("nom");
+                if (hashMap1Name.equals(hashMap2Name)) {
+                    String errorMessage = "Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom!";
+                    alert(errorMessage);
+                    return false;
+                }
+            }
+        }
+
+        //Make sure that no 2 characters have exactly the same attribute set
+        for(int i=0; i < possibilites.size(); i++){
+            for(int j= i + 1; j < possibilites.size(); j++){
+                HashMap<String, String> hashMap1 = possibilites.get(Integer.toString(i));
+                HashMap<String, String> hashMap2 = possibilites.get(Integer.toString(j));
+                hashMap1.remove("fichier");
+                hashMap2.remove("fichier");
+                hashMap1.remove("nom");
+                hashMap2.remove("nom");
+                if (hashMap1.equals(hashMap2)){
+                    String errorMessage = "Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer!";
+                    alert(errorMessage);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Show Information Alert
+    private void alert(String errorMessage) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Error Message");
+        alert.setHeaderText(null);
+        alert.setContentText(errorMessage);
+        alert.showAndWait();
     }
 
     private void saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) {

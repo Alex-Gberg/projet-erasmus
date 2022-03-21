@@ -58,8 +58,6 @@ public class Display {
         }
 
         numPics = loadPics(root);
-
-        display.getChildren().setAll(fillRows());
     }
 
     // Create display based on the name of a folder of images
@@ -71,8 +69,6 @@ public class Display {
             numRows--;
         }
         numColumns = numPics / numRows;
-
-        display.getChildren().setAll(fillRows());
     }
 
     // Load images based on a JSON
@@ -174,6 +170,7 @@ public class Display {
     }
 
     public VBox getDisplay() {
+        display.getChildren().setAll(fillRows());
         return display;
     }
 
@@ -188,10 +185,5 @@ public class Display {
     // Function to get single Image
     public Node getSingleImage(int index){
         return nodes.get(index);
-    }
-
-    // Get json.png as ImageView
-    public ImageView GetJSONImageView(){
-        return new ImageView(new Image(new File("src/main/resources/json.png").toURI().toString()));
     }
 }

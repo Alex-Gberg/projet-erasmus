@@ -251,7 +251,6 @@ public class Generator {
     private void setValueInputStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
-                //display.getDisplay(),
                 attributeValuesInputter
         )));
     }
@@ -259,11 +258,9 @@ public class Generator {
     private void setEndStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
-                display.GetJSONImageView(),
+                display.getDisplay(),
                 fileNamer
         )));
-
-
     }
 
     // possibilites is the Map which contains the information of each character

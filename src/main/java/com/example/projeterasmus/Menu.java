@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -73,43 +74,6 @@ public class Menu {
         ComboBox<String> imageSetSelector = new ComboBox<>(imageSets);
         imageSetSelector.setPromptText("Choisir les images");
 
-        // TODO add information label so that the user knows what happened with their import
-        Button importNewImageSetButton = new Button("Import new image set"); // TODO translate to french
-        importNewImageSetButton.setId("round-yellow");
-        importNewImageSetButton.setOnAction( e -> {
-            DirectoryChooser dc = new DirectoryChooser();
-            dc.setInitialDirectory(new File("/"));
-            dc.setTitle("Sélectionner un dossier");
-            File srcDir = dc.showDialog(new Stage());
-            if (srcDir == null) {
-                System.out.println("Import failed: user aborted");
-                return;
-            }
-            File destDir = new File("src/main/resources/character_sets/" + srcDir.getName());
-            try {
-                if (!containsNonImages(srcDir)) {
-                    if (containsAtLeastOneImage(srcDir)) {
-                        if (!characterSetExists(srcDir)) {
-                            copyDirectory(srcDir, destDir);
-                            System.out.println(srcDir + " has been imported to the game");
-                        }
-                        else {
-                            System.out.println("Import failed: " + srcDir.getName() + " already exists in the character sets");
-                        }
-                    }
-                    else {
-                        System.out.println("Import failed: " + srcDir + " doesn't contain any images");
-                    }
-                }
-                else {
-                    System.out.println("Import failed: " + srcDir + " contains files that are not images");
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
-        });
-
         Button generateButton = new Button("Générer un jeu");
         generateButton.setId("round-green");
         generateButton.setOnAction(e -> {
@@ -118,6 +82,40 @@ public class Menu {
                 new Generator(stage, selected);
             }
         });
+
+        Button importNewImageSetButton = new Button("Importer de nouvelles images");
+        importNewImageSetButton.setId("round-yellow");
+        importNewImageSetButton.setOnAction(e -> {
+            DirectoryChooser dc = new DirectoryChooser();
+            dc.setInitialDirectory(new File("/"));
+            dc.setTitle("Sélectionner un dossier");
+            File srcDir = dc.showDialog(new Stage());
+            if (srcDir == null) { return; }
+            File destDir = new File("src/main/resources/character_sets/" + srcDir.getName());
+            try {
+                if (!containsNonImages(srcDir)) {
+                    if (containsAtLeastOneImage(srcDir)) {
+                        if (!characterSetExists(srcDir)) {
+                            copyDirectory(srcDir, destDir);
+                            new Alert(Alert.AlertType.INFORMATION, srcDir + " has been imported").showAndWait();
+                        }
+                        else {
+                            new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir.getName() + " already exists in the character sets").showAndWait();
+                        }
+                    }
+                    else {
+                        new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir + " doesn't contain any images").showAndWait();
+                    }
+                }
+                else {
+                    new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir + " contains files that are not images").showAndWait();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        });
+
 
         Button quitGameButton = new Button("Quitter le jeu");
         quitGameButton.setId("round-red");
@@ -132,7 +130,7 @@ public class Menu {
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(350,0,133,80));
         buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, imageSetSelector, importNewImageSetButton, generateButton, quitGameButton);
+        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, imageSetSelector, generateButton, importNewImageSetButton, quitGameButton);
 
         // Create Label
         Label tradeMarkLabel = new Label("@Qui-est-ce? - Groupe Erasmus");

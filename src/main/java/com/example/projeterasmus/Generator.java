@@ -6,8 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -35,6 +33,7 @@ public class Generator {
     private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
     private ObservableList<String> attributeList;
     private TreeMap<String, HashMap<String, String>> possibilites;
+    private HashMap<String, ? super Object> generatorMap;
 
     public Generator(Stage stage, String imageFolder) {
         this.stage = stage;
@@ -143,7 +142,7 @@ public class Generator {
 
     // Returns a "widget" for inputting the values of each attribute
     private Node makeAttributeValuesInputter() {
-        Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
+        Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns);
         VBox singleImageDisplayVbox = new VBox();
         singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
         HashMap<String, TextField> textFieldMap = new HashMap<>();
@@ -155,37 +154,42 @@ public class Generator {
         }
 
         Button nextImageButton = new Button("Valider");
-        Label infoLabel = new Label();
         nextImageButton.setOnAction(e -> {
-            int res = processAttributeValueInput(textFieldMap);
-            if (res < 0) {
-                infoLabel.setText("Remplir tous les champs!");
+            if (processAttributeValueInput(textFieldMap) < 0) {
+                new Alert(Alert.AlertType.WARNING, "Il faut remplir tous les champs!").showAndWait();
             }
             else {
-                textFieldMap.get("nom").clear();
-                for (String attribute : attributeList) {
-                    textFieldMap.get(attribute).clear();
-                }
-                imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (++currentImageIndex + 1));
+                currentImageIndex++;
                 if (currentImageIndex >= (numRows * numColumns)) {
-                    setEndStage();
-                } else {
-                    singleImageDisplayVbox.getChildren().clear();
-                    singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
+                    if (validatePossibilites()) {
+                        generatorMap = makeGeneratorMap();
+                        setEndStage();
+                    }
+                    else {
+                        new Menu(stage);
+                    }
                 }
-                infoLabel.setText("");
+                else {
+                    textFieldMap.get("nom").clear();
+                    for (String attribute : attributeList) {
+                        textFieldMap.get(attribute).clear();
+                    }
+                    singleImageDisplayVbox.getChildren().setAll(display.getSingleImage(currentImageIndex));
+                    imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns);
+                    if (currentImageIndex + 1 >= (numRows * numColumns)) {
+                        nextImageButton.setText("Finir");
+                    }
+                }
             }
         });
 
         VBox form = new VBox(singleImageDisplayVbox);
-        //VBox form = new VBox(imageIndicator);
         form.getChildren().add(imageIndicator);
         form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
         for (String attribute : attributeList) {
             form.getChildren().add(new HBox(new Label(attribute + ": "), textFieldMap.get(attribute)));
         }
-        form.getChildren().add(new HBox(nextImageButton, infoLabel));
-
+        form.getChildren().add(nextImageButton);
         return form;
     }
 
@@ -212,29 +216,25 @@ public class Generator {
     private Node makeFileNamer() {
         TextField fileNameInput = new TextField(imageFolder + "_a_vous");
         Button saveButton = new Button("Enregistrer");
-        Label infoLabel = new Label();
         saveButton.setOnAction(e -> {
             String proposedName = fileNameInput.getText().strip();
             for (CharSequence c : ILLEGAL_CHARACTERS) { // TODO check for an existing file of the same name to warn of overwriting?
                 if (proposedName.contains(c)) {
-                    infoLabel.setText(proposedName + " n'est pas un nom de fichier valide!\n Il contient: " + c);
+                    new Alert(Alert.AlertType.ERROR, "\"" + proposedName + "\" n'est pas un nom de fichier valide car il contient: \"" + c + "\"").showAndWait();
                     stage.sizeToScene();
                     return;
                 }
             }
-            saveJSON(makeGeneratorMap(), proposedName);
+            saveJSON(generatorMap, proposedName);
             fileNameInput.setEditable(false);
             saveButton.setDisable(true);
-            String message = "Enregistré avec succès sous: " + proposedName;
-            infoLabel.setText(message);
-            GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, message, proposedName);
+            GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous: \"" + proposedName + "\"", proposedName);
             generatorCompletion.showGeneratorCompletionStage();
         });
 
         return new VBox(
                 new Label("Nommer le fichier: "),
-                new HBox(fileNameInput, saveButton),
-                infoLabel
+                new HBox(fileNameInput, saveButton)
         );
     }
 
@@ -291,26 +291,21 @@ public class Generator {
         generatorMap.put("colonne", String.valueOf(numColumns));
         generatorMap.put("possibilites", possibilites);
 
-        if (!validatePossibilites(generatorMap)){
-            System.out.println("GeneratorMap could not be made! Return to Menu.");
-            new Menu(stage);
-            return null;
-        }
         return generatorMap;
     }
 
-    private Boolean validatePossibilites(HashMap<String, ? super Object> generatorMap) {
-        //Check first that the Attribute Nom for each PNG is different
+    private Boolean validatePossibilites() {
+        // Check first that the Attribute Nom for each PNG is different
         for (int i = 0; i < possibilites.size() - 1; i++){
             for (int j = i + 1; j < possibilites.size(); j++) {
                 if (possibilites.get(String.valueOf(i)).get("nom").equals(possibilites.get(String.valueOf(j)).get("nom"))) {
-                    alert("Error: Nommage invalide! Les photos ne peuvent pas avoir le même nom! Le jeu se termine! Retour au menu!");
+                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Nommage invalide! Les photos ne peuvent pas avoir le même nom!").showAndWait();
                     return false;
                 }
             }
         }
 
-        //Make sure that no 2 characters have exactly the same attribute set
+        // Make sure that no 2 characters have exactly the same attribute set
         for (int i = 0; i < possibilites.size() - 1; i++){
             for (int j = i + 1; j < possibilites.size(); j++){
                 HashMap<String, String> iAttributes = new HashMap<>(possibilites.get(Integer.toString(i)));
@@ -320,21 +315,12 @@ public class Generator {
                 jAttributes.remove("fichier");
                 jAttributes.remove("nom");
                 if (iAttributes.equals(jAttributes)){
-                    alert("Error: 2 caractères ne peuvent pas avoir exactement le même ensemble d'attributs.! Il faut savoir les distinguer! Le jeu se termine! Retour au menu!");
+                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Deux caractères ne peuvent pas avoir exactement le même ensemble d'attributs!").showAndWait();
                     return false;
                 }
             }
         }
         return true;
-    }
-
-    // Show Information Alert
-    private void alert(String errorMessage) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Error Message");
-        alert.setHeaderText(null);
-        alert.setContentText(errorMessage);
-        alert.showAndWait();
     }
 
     private void saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) {

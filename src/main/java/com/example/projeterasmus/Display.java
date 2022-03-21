@@ -184,4 +184,14 @@ public class Display {
         numColumns = newColumns;
         display.getChildren().setAll(fillRows());
     }
+
+    // Function to get single Image
+    public Node getSingleImage(int index){
+        return nodes.get(index);
+    }
+
+    // Get json.png as ImageView
+    public ImageView GetJSONImageView(){
+        return new ImageView(new Image(new File("src/main/resources/json.png").toURI().toString()));
+    }
 }

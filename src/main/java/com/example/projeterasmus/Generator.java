@@ -6,6 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -56,6 +58,7 @@ public class Generator {
             attributeValuesInputter = makeAttributeValuesInputter();
             setValueInputStage();
         });
+
 
         setInitialStage();
     }
@@ -140,7 +143,8 @@ public class Generator {
     // Returns a "widget" for inputting the values of each attribute
     private Node makeAttributeValuesInputter() {
         Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1));
-
+        VBox singleImageDisplayVbox = new VBox();
+        singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
         HashMap<String, TextField> textFieldMap = new HashMap<>();
 
         textFieldMap.put("nom", new TextField());
@@ -164,11 +168,16 @@ public class Generator {
                 imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (++currentImageIndex + 1));
                 if (currentImageIndex >= (numRows * numColumns)) {
                     setEndStage();
+                } else {
+                    singleImageDisplayVbox.getChildren().clear();
+                    singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
                 }
             }
         });
 
-        VBox form = new VBox(imageIndicator);
+        VBox form = new VBox(singleImageDisplayVbox);
+        //VBox form = new VBox(imageIndicator);
+        form.getChildren().add(imageIndicator);
         form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
         for (String attribute : attributeList) {
             form.getChildren().add(new HBox(new Label(attribute + ": "), textFieldMap.get(attribute)));
@@ -237,7 +246,7 @@ public class Generator {
     private void setValueInputStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
-                display.getDisplay(),
+                //display.getDisplay(),
                 attributeValuesInputter
         )));
     }
@@ -245,7 +254,7 @@ public class Generator {
     private void setEndStage() {
         stage.setScene(new Scene(new VBox(
                 optionButton,
-                display.getDisplay(),
+                display.GetJSONImageView(),
                 fileNamer
         )));
 

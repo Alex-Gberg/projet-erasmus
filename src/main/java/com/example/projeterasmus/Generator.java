@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 
@@ -21,12 +22,10 @@ public class Generator {
     private int numRows;
     private int numColumns;
 
+    private  VBox mainVBox;
     private final Button optionButton;
     private final Display display;
     private final Node fileNamer;
-    private final Node gridSizer;
-    private final Node attributesInputter;
-    private final Button proceedToAttributeValueInput; // Could use a better variable name
     private Node attributeValuesInputter;
     private int currentImageIndex;
 
@@ -47,19 +46,33 @@ public class Generator {
         numColumns = display.getNumRowsCols()[1];
 
         fileNamer = makeFileNamer();
-        gridSizer = makeGridSizer();
-        attributesInputter = makeAttributeGetter();
+        Node gridSizer = makeGridSizer();
+        Node attributesInputter = makeAttributeGetter();
 
-        proceedToAttributeValueInput = new Button("Valider et passer aux entrées de valeur d'attribut");
+        // Could use a better variable name
+        Button proceedToAttributeValueInput = new Button("Valider et passer aux entrées de valeur d'attribut");
 
         proceedToAttributeValueInput.setOnAction(e -> {
             instantiatePossibilites();
             attributeValuesInputter = makeAttributeValuesInputter();
-            setValueInputStage();
+            mainVBox.getChildren().setAll(
+                optionButton,
+                attributeValuesInputter
+            );
+            stage.sizeToScene();
         });
 
 
-        setInitialStage();
+        mainVBox = new VBox();
+        stage.setScene(new Scene(mainVBox));
+        mainVBox.getChildren().setAll(
+            optionButton,
+            display.getDisplay(),
+                gridSizer,
+                attributesInputter,
+                proceedToAttributeValueInput
+        );
+        stage.sizeToScene();
     }
 
     // Returns a "widget" for adjusting the grid size
@@ -106,7 +119,6 @@ public class Generator {
         );
     }
 
-    // TODO dont allow adding nom or fichier attributes
     // Returns a "widget" for inputting the list of attributes
     private Node makeAttributeGetter() {
         attributeList = FXCollections.observableArrayList();
@@ -120,7 +132,7 @@ public class Generator {
         Button addAttribute = new Button("Ajouter");
         addAttribute.setOnAction(e -> {
             String text = attributeInput.getText().strip().toLowerCase();
-            if (text.length() != 0 && !attributeList.contains(text)) {
+            if (text.length() != 0 && !attributeList.contains(text) && !text.equals("nom") && !text.equals("fichier")) {
                 attributeList.add(text);
             }
             attributeInput.clear();
@@ -144,7 +156,7 @@ public class Generator {
     private Node makeAttributeValuesInputter() {
         Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns);
         VBox singleImageDisplayVbox = new VBox();
-        singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
+        singleImageDisplayVbox.getChildren().setAll(display.getSingleImage(currentImageIndex));
         HashMap<String, TextField> textFieldMap = new HashMap<>();
 
         textFieldMap.put("nom", new TextField());
@@ -163,7 +175,12 @@ public class Generator {
                 if (currentImageIndex >= (numRows * numColumns)) {
                     if (validatePossibilites()) {
                         generatorMap = makeGeneratorMap();
-                        setEndStage();
+                        mainVBox.getChildren().setAll(
+                            optionButton,
+                            display.getDisplay(),
+                            fileNamer
+                        );
+                        stage.sizeToScene();
                     }
                     else {
                         new Menu(stage);
@@ -183,8 +200,7 @@ public class Generator {
             }
         });
 
-        VBox form = new VBox(singleImageDisplayVbox);
-        form.getChildren().add(imageIndicator);
+        VBox form = new VBox(singleImageDisplayVbox, imageIndicator);
         form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
         for (String attribute : attributeList) {
             form.getChildren().add(new HBox(new Label(attribute + ": "), textFieldMap.get(attribute)));
@@ -218,49 +234,28 @@ public class Generator {
         Button saveButton = new Button("Enregistrer");
         saveButton.setOnAction(e -> {
             String proposedName = fileNameInput.getText().strip();
-            for (CharSequence c : ILLEGAL_CHARACTERS) { // TODO check for an existing file of the same name to warn of overwriting?
+            for (CharSequence c : ILLEGAL_CHARACTERS) {
                 if (proposedName.contains(c)) {
                     new Alert(Alert.AlertType.ERROR, "\"" + proposedName + "\" n'est pas un nom de fichier valide car il contient: \"" + c + "\"").showAndWait();
-                    stage.sizeToScene();
                     return;
                 }
             }
-            saveJSON(generatorMap, proposedName);
-            fileNameInput.setEditable(false);
-            saveButton.setDisable(true);
-            GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous: \"" + proposedName + "\"", proposedName);
-            generatorCompletion.showGeneratorCompletionStage();
+            try {
+                if (saveJSON(generatorMap, proposedName)) {
+                    fileNameInput.setEditable(false);
+                    saveButton.setDisable(true);
+                    GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous: \"" + proposedName + "\"", proposedName);
+                    generatorCompletion.showGeneratorCompletionStage();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
 
         return new VBox(
                 new Label("Nommer le fichier: "),
                 new HBox(fileNameInput, saveButton)
         );
-    }
-
-    private void setInitialStage() {
-        stage.setScene(new Scene(new VBox(
-                optionButton,
-                display.getDisplay(),
-                gridSizer,
-                attributesInputter,
-                proceedToAttributeValueInput
-        )));
-    }
-
-    private void setValueInputStage() {
-        stage.setScene(new Scene(new VBox(
-                optionButton,
-                attributeValuesInputter
-        )));
-    }
-
-    private void setEndStage() {
-        stage.setScene(new Scene(new VBox(
-                optionButton,
-                display.getDisplay(),
-                fileNamer
-        )));
     }
 
     // possibilites is the Map which contains the information of each character
@@ -320,17 +315,29 @@ public class Generator {
         return true;
     }
 
-    private void saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) {
+    private boolean saveJSON(HashMap<String, ? super Object> generatorMap, String fileName) throws IOException {
         if (generatorMap == null) {
-            return;
+            return false;
         }
 
-        try (Writer writer = new FileWriter("src/main/resources/JSON/" + fileName + ".json")) {
-            Gson gson = new Gson();
+        Gson gson = new Gson();
+        File file = new File("src/main/resources/JSON/" + fileName + ".json");
+        if (file.exists()) {
+            Optional<ButtonType> confirmResult = new Alert(Alert.AlertType.CONFIRMATION, fileName + " existe déjà, voulez-vous l'écraser?").showAndWait();
+            if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
+                try (Writer writer = new FileWriter(file)) {
+                    gson.toJson(generatorMap, writer);
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        try (Writer writer = new FileWriter(file)) {
             gson.toJson(generatorMap, writer);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        return true;
     }
 }

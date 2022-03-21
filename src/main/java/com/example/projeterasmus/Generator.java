@@ -223,7 +223,10 @@ public class Generator {
             saveJSON(makeGeneratorMap(), proposedName);
             fileNameInput.setEditable(false);
             saveButton.setDisable(true);
-            infoLabel.setText("Enregistré avec succès sous: " + proposedName);
+            String message = "Enregistré avec succès sous: " + proposedName;
+            infoLabel.setText(message);
+            GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, message, proposedName);
+            generatorCompletion.showGeneratorCompletionStage();
         });
 
         return new VBox(

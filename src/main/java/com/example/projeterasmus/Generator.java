@@ -107,6 +107,7 @@ public class Generator {
         );
     }
 
+    // TODO dont allow adding nom or fichier attributes
     // Returns a "widget" for inputting the list of attributes
     private Node makeAttributeGetter() {
         attributeList = FXCollections.observableArrayList();
@@ -172,6 +173,7 @@ public class Generator {
                     singleImageDisplayVbox.getChildren().clear();
                     singleImageDisplayVbox.getChildren().add(display.getSingleImage(currentImageIndex));
                 }
+                infoLabel.setText("");
             }
         });
 

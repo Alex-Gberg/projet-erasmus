@@ -288,13 +288,12 @@ public class Generator {
         return generatorMap;
     }
 
-    // TODO give more info about which images made the test fail
     private Boolean validatePossibilites() {
         // Check first that the Attribute Nom for each PNG is different
         for (int i = 0; i < possibilites.size() - 1; i++){
             for (int j = i + 1; j < possibilites.size(); j++) {
                 if (possibilites.get(String.valueOf(i)).get("nom").equals(possibilites.get(String.valueOf(j)).get("nom"))) {
-                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Nommage invalide! Les photos ne peuvent pas avoir le même nom!").showAndWait();
+                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Nommage invalide\nLes images #" + (i+1)+ " et #" + (j+1) + " ont le même nom!").showAndWait();
                     return false;
                 }
             }
@@ -310,7 +309,7 @@ public class Generator {
                 jAttributes.remove("fichier");
                 jAttributes.remove("nom");
                 if (iAttributes.equals(jAttributes)){
-                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Deux caractères ne peuvent pas avoir exactement le même ensemble d'attributs!").showAndWait();
+                    new Alert(Alert.AlertType.ERROR, "La génération a échoué: Valeurs d'attribut invalide\nLes images #" + (i+1) + " et #" + (j+1) + " ont exactement les mêmes valeurs d'attribut!").showAndWait();
                     return false;
                 }
             }

@@ -26,7 +26,6 @@ public class Generator {
     private final Button optionButton;
     private final Display display;
     private final Node fileNamer;
-    private Node attributeValuesInputter;
     private int currentImageIndex;
 
     private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
@@ -49,17 +48,20 @@ public class Generator {
         Node gridSizer = makeGridSizer();
         Node attributesInputter = makeAttributeGetter();
 
-        // Could use a better variable name
         Button proceedToAttributeValueInput = new Button("Valider et passer aux entrées de valeur d'attribut");
-
         proceedToAttributeValueInput.setOnAction(e -> {
-            instantiatePossibilites();
-            attributeValuesInputter = makeAttributeValuesInputter();
-            mainVBox.getChildren().setAll(
-                optionButton,
-                attributeValuesInputter
-            );
-            stage.sizeToScene();
+            if (attributeList.size() > 0) {
+                instantiatePossibilites();
+                Node attributeValuesInputter = makeAttributeValuesInputter();
+                mainVBox.getChildren().setAll(
+                        optionButton,
+                        attributeValuesInputter
+                );
+                stage.sizeToScene();
+            }
+            else {
+                new Alert(Alert.AlertType.WARNING, "Saisir au moins un attribut").showAndWait();
+            }
         });
 
 
@@ -196,6 +198,7 @@ public class Generator {
                     if (currentImageIndex + 1 >= (numRows * numColumns)) {
                         nextImageButton.setText("Finir");
                     }
+                    stage.sizeToScene();
                 }
             }
         });
@@ -236,7 +239,7 @@ public class Generator {
             String proposedName = fileNameInput.getText().strip();
             for (CharSequence c : ILLEGAL_CHARACTERS) {
                 if (proposedName.contains(c)) {
-                    new Alert(Alert.AlertType.ERROR, "\"" + proposedName + "\" n'est pas un nom de fichier valide car il contient: \"" + c + "\"").showAndWait();
+                    new Alert(Alert.AlertType.WARNING, "\"" + proposedName + "\" n'est pas un nom de fichier valide car il contient: \"" + c + "\"").showAndWait();
                     return;
                 }
             }
@@ -244,7 +247,7 @@ public class Generator {
                 if (saveJSON(generatorMap, proposedName)) {
                     fileNameInput.setEditable(false);
                     saveButton.setDisable(true);
-                    GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous: \"" + proposedName + "\"", proposedName);
+                    GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous:\n\"" + proposedName + "\"", proposedName);
                     generatorCompletion.showGeneratorCompletionStage();
                 }
             } catch (IOException ex) {
@@ -286,6 +289,7 @@ public class Generator {
         return generatorMap;
     }
 
+    // TODO give more info about which images made the test fail
     private Boolean validatePossibilites() {
         // Check first that the Attribute Nom for each PNG is different
         for (int i = 0; i < possibilites.size() - 1; i++){

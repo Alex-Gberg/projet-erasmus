@@ -47,6 +47,9 @@ public class Menu {
             if (selected != null) {
                 new Game(stage, selected + ".json");
             }
+            else {
+                new Alert(Alert.AlertType.INFORMATION, "Le type de caractères doit être choisi avant de commencer un nouveau jeu").showAndWait();
+            }
         });
 
         Button loadGameButton = new Button("Continuer la partie");
@@ -66,7 +69,7 @@ public class Menu {
                 new Game(stage, root.get("generator").getAsString(), root.get("target").getAsInt(), crossedOut);
 
             } catch (FileNotFoundException ex) {
-                System.out.println("Cannot continue game: no save file currently exists");
+                new Alert(Alert.AlertType.INFORMATION, "Impossible de continuer la partie: aucun fichier de sauvegarde n'existe actuellement").showAndWait();
             }
         });
 
@@ -80,6 +83,9 @@ public class Menu {
             String selected = imageSetSelector.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 new Generator(stage, selected);
+            }
+            else {
+                new Alert(Alert.AlertType.INFORMATION, "Les images doivent être choisi avant de commencer la génération d'un jeu").showAndWait();
             }
         });
 
@@ -97,18 +103,18 @@ public class Menu {
                     if (containsAtLeastOneImage(srcDir)) {
                         if (!characterSetExists(srcDir)) {
                             copyDirectory(srcDir, destDir);
-                            new Alert(Alert.AlertType.INFORMATION, srcDir + " has been imported").showAndWait();
+                            new Alert(Alert.AlertType.INFORMATION, srcDir + " a été importé avec succès").showAndWait();
                         }
                         else {
-                            new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir.getName() + " already exists in the character sets").showAndWait();
+                            new Alert(Alert.AlertType.ERROR, "L'importation a échoué: \"" + srcDir.getName() + "\" existe déjà").showAndWait();
                         }
                     }
                     else {
-                        new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir + " doesn't contain any images").showAndWait();
+                        new Alert(Alert.AlertType.ERROR, "L'importation a échoué: \"" + srcDir + "\" ne contient aucune image").showAndWait();
                     }
                 }
                 else {
-                    new Alert(Alert.AlertType.ERROR, "Import failed: " + srcDir + " contains files that are not images").showAndWait();
+                    new Alert(Alert.AlertType.ERROR, "L'importation a échoué: \"" + srcDir + "\" contient des fichiers qui ne sont pas des images").showAndWait();
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();

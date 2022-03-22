@@ -122,7 +122,6 @@ public class Menu {
 
         });
 
-
         Button quitGameButton = new Button("Quitter le jeu");
         quitGameButton.setId("round-red");
         quitGameButton.setOnAction(e -> stage.close());
@@ -131,35 +130,45 @@ public class Menu {
         BorderPane borderPane = new BorderPane();
         borderPane.setId("pane");
 
-        // Put buttons VBox and Borderpane
-        VBox buttonsBox = new VBox();
-        buttonsBox.setAlignment(Pos.CENTER);
-        buttonsBox.setPadding(new Insets(350,0,133,80));
-        buttonsBox.setSpacing(10);
-        buttonsBox.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton, imageSetSelector, generateButton, importNewImageSetButton, quitGameButton);
+        // Button VBox Left
+        VBox buttonBoxLeft = new VBox();
+        buttonBoxLeft.setSpacing(10);
+        buttonBoxLeft.setAlignment(Pos.CENTER);
+        buttonBoxLeft.setPadding(new Insets(300,0,0,10));
+        buttonBoxLeft.getChildren().addAll(characterSetSelector, newGameButton, loadGameButton);
+        // Button VBox Right
+        VBox buttonsBoxRight = new VBox();
+        buttonsBoxRight.setSpacing(10);
+        buttonsBoxRight.setAlignment(Pos.CENTER);
+        buttonsBoxRight.setPadding(new Insets(300,10,0,0));
+        buttonsBoxRight.getChildren().addAll(imageSetSelector, generateButton, importNewImageSetButton);
+        // Button Box Middle
+        VBox buttonsBoxMiddle = new VBox();
+        buttonsBoxMiddle.setSpacing(10);
+        buttonsBoxMiddle.setAlignment(Pos.CENTER);
+        buttonsBoxMiddle.setPadding(new Insets(10,0,50,0));
+        buttonsBoxMiddle.getChildren().add(quitGameButton);
 
-        // Create Label
-        Label tradeMarkLabel = new Label("@Qui-est-ce? - Groupe Erasmus");
-        tradeMarkLabel.setId("tradeMarkLabel");
-
-        // HBox for Label
-        HBox bottomBox = new HBox();
+        // HBox
         HBox leftBottom = new HBox();
-        HBox centerBottom = new HBox();
+        HBox rightBottom = new HBox();
 
-        leftBottom.getChildren().add(tradeMarkLabel);
-        centerBottom.getChildren().add(buttonsBox);
+        leftBottom.getChildren().add(buttonBoxLeft);
+        rightBottom.getChildren().add(buttonsBoxRight);
 
         leftBottom.setAlignment(Pos.BOTTOM_LEFT);
-        centerBottom.setAlignment(Pos.BOTTOM_CENTER);
-        centerBottom.setPadding(new Insets(-50));
+        rightBottom.setAlignment(Pos.BOTTOM_RIGHT);
 
-        bottomBox.getChildren().addAll(leftBottom, centerBottom);
+        borderPane.setBottom(buttonsBoxMiddle);
+        borderPane.setLeft(leftBottom);
+        borderPane.setRight(rightBottom);
 
-        borderPane.setBottom(bottomBox);
+        // Create Borderpane2 where we put borderpane in the bottom of borderpane2
+        BorderPane borderPane2 = new BorderPane();
+        borderPane2.setBottom(borderPane);
+        borderPane2.setId("pane2");
 
-
-        Scene scene = new Scene(borderPane, 500, 600);
+        Scene scene = new Scene(borderPane2, 550, 450);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         stage.setScene(scene);
     }

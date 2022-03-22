@@ -32,7 +32,6 @@ public class Game {
     private ComboBox<String> valueSelector;
     private Button guessButton;
     private Label guessResult;
-    private Button optionButton;
     private boolean autoMode;
     private Label modeLabel;
 
@@ -91,16 +90,17 @@ public class Game {
         valueSelector.setPromptText("Choisir une valeur");
         propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
         guessButton = new Button("Interroger!");
+        guessButton.setDefaultButton(true);
         guessButton.setOnAction(e -> processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem()));
         guessResult = new Label();
         constructGuesser();
 
-        optionButton = new Button("Options");
-        optionButton.setOnAction(e -> new Options(stage, this).showOptions());
+        Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
         modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
 
         stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
+        guessButton.requestFocus();
     }
 
     private HashMap<String, Set<String>> findProperties(JsonObject root) {

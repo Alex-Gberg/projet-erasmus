@@ -37,8 +37,7 @@ public class Generator {
         this.stage = stage;
         this.imageFolder = imageFolder;
 
-        optionButton = new Button("Options");
-        optionButton.setOnAction(e -> new Options(stage).showOptions());
+        optionButton = new Options(stage).getOptionsButton();
 
         display = new Display(imageFolder);
         numRows = display.getNumRowsCols()[0];

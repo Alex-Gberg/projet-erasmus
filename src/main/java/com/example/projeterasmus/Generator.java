@@ -3,6 +3,7 @@ package com.example.projeterasmus;
 import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -65,6 +66,7 @@ public class Generator {
 
 
         mainVBox = new VBox();
+        mainVBox.setSpacing(5);
         stage.setScene(new Scene(mainVBox));
         mainVBox.getChildren().setAll(
             optionButton,
@@ -110,14 +112,38 @@ public class Generator {
             columnInput.clear();
         });
 
+        VBox rowInputVBox = new VBox(rowInputLabel, rowInput);
+        rowInputVBox.setSpacing(5);
+        VBox columnInputVBox = new VBox(columnInputLabel, columnInput);
+        columnInputVBox.setSpacing(5);
+        VBox infoLabelVBox = new VBox(infoLabel, validateRowColumnButton);
+        infoLabelVBox.setSpacing(5);
+
+        HBox hBox = new HBox(rowInputVBox, columnInputVBox, infoLabelVBox);
+        hBox.setSpacing(5);
+
+        VBox makeGridSizer = new VBox (
+                new Label("Ajuster la taille de la grille:"),
+                hBox
+                );
+         makeGridSizer.setSpacing(5);
+
+
+        return makeGridSizer;
+
+        /*
+        VBox rowInputVBox = new VBox(rowInputLabel, rowInput);
+        rowInputVBox.setSpacing(10);
+        VBox columnInputVBox = new VBox(columnInputLabel, columnInput);
+        columnInputVBox.setSpacing(10);
+        VBox infoLabelVBox = new VBox(infoLabel, validateRowColumnButton);
+        infoLabelVBox.setSpacing(10);
+
         return new VBox (
                 new Label("Ajuster la taille de la grille:"),
-                new HBox (
-                        new VBox(rowInputLabel, rowInput),
-                        new VBox(columnInputLabel, columnInput),
-                        new VBox(infoLabel, validateRowColumnButton)
-                )
+                new HBox (rowInputVBox, columnInputVBox, infoLabelVBox)
         );
+         */
     }
 
     // Returns a "widget" for inputting the list of attributes
@@ -146,11 +172,19 @@ public class Generator {
             attributeListView.getSelectionModel().clearSelection();
         });
 
-        return new VBox (
+        HBox attributeHBox = new HBox(attributeInput, addAttribute, removeAttribute);
+        attributeHBox.setSpacing(5);
+
+        VBox makeAttributeGetterVBox = new VBox (
                 new Label("Définir les attributs:"),
-                new HBox(attributeInput, addAttribute, removeAttribute),
+                attributeHBox,
                 attributeListView
         );
+
+        makeAttributeGetterVBox.setSpacing(5);
+        makeAttributeGetterVBox.setPadding(new Insets(5,0,0,0));
+
+        return makeAttributeGetterVBox;
     }
 
     // Returns a "widget" for inputting the values of each attribute

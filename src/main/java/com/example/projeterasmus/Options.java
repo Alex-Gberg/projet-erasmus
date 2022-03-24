@@ -78,14 +78,14 @@ public class Options {
         infoLabel.setStyle("-fx-text-fill:WHITE;");
 
         Button modeButton = new Button("Changer de mode");
-        modeButton.setId("round-green");
+        modeButton.setId("round-purple");
         modeButton.setOnAction(e -> {
             game.toggleMode();
             infoLabel.setText("Mode: " + (game.getAutoMode() ? "Automatique" : "Manuel"));
         });
 
         Button saveButton = new Button("Sauvegarder la partie");
-        saveButton.setId("round-green");
+        saveButton.setId("round-blue");
         saveButton.setOnAction(e -> {
             game.save();
             infoLabel.setText("Enregistré avec succès!");

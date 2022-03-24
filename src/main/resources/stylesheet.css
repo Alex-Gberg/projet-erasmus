@@ -50,16 +50,29 @@
 
 #round-blue{
     -fx-background-color:
-        linear-gradient(#e66465, #9198e5),
-        radial-gradient(center 50% -40%, radius 200%, #e66465 45%, #9198e5 50%);
+        linear-gradient(#00bfff, #87ceeb),
+        radial-gradient(center 50% -40%, radius 200%, #00bfff 45%, #87ceeb 50%);
     -fx-background-radius: 30;
     -fx-background-insets: 0;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-pref-height: 28px;
     -fx-pref-width: 200px;
-
 }
+
+#round-purple{
+    -fx-background-color:
+        linear-gradient(#42275a, #734b6d),
+        radial-gradient(center 50% -40%, radius 200%, #42275a 45%, #734b6d 50%);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-pref-height: 28px;
+    -fx-pref-width: 200px;
+}
+
+
 
 #tradeMarkLabel{
     -fx-background-color: #EEEEEE;

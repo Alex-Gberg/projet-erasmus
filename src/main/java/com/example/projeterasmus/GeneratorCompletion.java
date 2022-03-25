@@ -9,26 +9,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class GeneratorCompletion {
-    Stage GeneratorCompletionStage;
-    BorderPane borderPane;
-    Label message;
-    VBox buttonsBox;
-    Button startGameButton;
-    Button toMenuButton;
-    Button quitButton;
+    private final Stage GeneratorCompletionStage;
+    private final BorderPane borderPane;
 
-    public GeneratorCompletion(Stage mainStage, String completionMessage, String jsonFileName) {
+    public GeneratorCompletion(Stage mainStage, String jsonFileName) {
         GeneratorCompletionStage = new Stage();
         GeneratorCompletionStage.setResizable(false);
         GeneratorCompletionStage.setTitle("Générateur enregistré avec succès");
 
-        message = new Label(completionMessage);
+        Label message = new Label("Enregistré avec succès sous:\n\"" + jsonFileName + "\"");
         message.setId("label-white");
 
-        buttonsBox = new VBox();
+        VBox buttonsBox = new VBox();
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setPadding(new Insets(10,10,10,10));
         buttonsBox.setSpacing(10);
@@ -36,23 +29,23 @@ public class GeneratorCompletion {
         borderPane = new BorderPane();
         borderPane.setCenter(buttonsBox);
         borderPane.setId("backgroundBlack");
-        borderPane.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        borderPane.getStylesheets().add("stylesheet.css");
 
-        startGameButton = new Button("Commencer le jeu");
+        Button startGameButton = new Button("Commencer le jeu");
         startGameButton.setId("round-green");
         startGameButton.setOnAction(e -> {
             new Game(mainStage, jsonFileName + ".json");
             GeneratorCompletionStage.close();
         });
 
-        toMenuButton = new Button("Retour au menu");
+        Button toMenuButton = new Button("Retour au menu");
         toMenuButton.setId("round-yellow");
         toMenuButton.setOnAction(e -> {
             new Menu(mainStage);
             GeneratorCompletionStage.close();
         });
 
-        quitButton = new Button("Quitter");
+        Button quitButton = new Button("Quitter");
         quitButton.setId("round-red");
         quitButton.setOnAction(e -> {
             mainStage.close();
@@ -61,7 +54,6 @@ public class GeneratorCompletion {
 
         buttonsBox.getChildren().setAll(message, startGameButton, toMenuButton, quitButton);
     }
-
 
     public void showGeneratorCompletionStage() {
         GeneratorCompletionStage.setScene(new Scene(borderPane));

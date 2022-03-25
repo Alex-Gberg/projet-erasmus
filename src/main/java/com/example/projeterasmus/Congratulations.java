@@ -11,8 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class Congratulations {
     public Congratulations(Stage mainStage) {
         Stage congratulationStage = new Stage();
@@ -68,7 +66,7 @@ public class Congratulations {
         borderPane.setId("backgroundBlack");
 
         Scene scene = new Scene(borderPane, 498, 350);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        scene.getStylesheets().add("stylesheet.css");
         congratulationStage.setScene(scene);
         congratulationStage.setTitle("Félicitations");
         congratulationStage.show();

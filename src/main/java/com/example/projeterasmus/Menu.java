@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -89,7 +88,7 @@ public class Menu {
             }
         });
 
-        Button importNewImageSetButton = new Button("Importer de nouvelles images");
+        Button importNewImageSetButton = new Button("Importer des images");
         importNewImageSetButton.setId("round-yellow");
         importNewImageSetButton.setOnAction(e -> {
             DirectoryChooser dc = new DirectoryChooser();
@@ -169,7 +168,7 @@ public class Menu {
         borderPane2.setId("pane2");
 
         Scene scene = new Scene(borderPane2, 550, 450);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        scene.getStylesheets().add("stylesheet.css");
         stage.setScene(scene);
     }
 

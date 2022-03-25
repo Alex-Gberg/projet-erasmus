@@ -8,7 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -50,7 +50,8 @@ public class Generator {
         Node gridSizer = makeGridSizer();
         Node attributesInputter = makeAttributeGetter();
 
-        Button proceedToAttributeValueInput = new Button("Valider et passer aux entrées de valeur d'attribut");
+        Button proceedToAttributeValueInput = new Button("Valider et continuer");
+        proceedToAttributeValueInput.setId("round-green");
         proceedToAttributeValueInput.setOnAction(e -> {
             if (attributeList.size() > 0) {
                 instantiatePossibilites();
@@ -69,7 +70,6 @@ public class Generator {
 
         mainVBox = new VBox();
         mainVBox.setSpacing(5);
-        stage.setScene(new Scene(mainVBox));
         mainVBox.getChildren().setAll(
             optionButton,
             display.getDisplay(),
@@ -77,6 +77,10 @@ public class Generator {
                 attributesInputter,
                 proceedToAttributeValueInput
         );
+
+        Scene scene = new Scene(mainVBox);
+        scene.getStylesheets().add("stylesheet.css");
+        stage.setScene(scene);
         stage.sizeToScene();
     }
 
@@ -126,30 +130,14 @@ public class Generator {
 
         Label ajusterTailleLabel = new Label("Ajuster la taille de la grille:");
         ajusterTailleLabel.setId("smallTitle");
-        ajusterTailleLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
 
-        VBox makeGridSizer = new VBox (
-                ajusterTailleLabel,
-                hBox
-                );
-         makeGridSizer.setSpacing(5);
-
-
-        return makeGridSizer;
-
-        /*
-        VBox rowInputVBox = new VBox(rowInputLabel, rowInput);
-        rowInputVBox.setSpacing(10);
-        VBox columnInputVBox = new VBox(columnInputLabel, columnInput);
-        columnInputVBox.setSpacing(10);
-        VBox infoLabelVBox = new VBox(infoLabel, validateRowColumnButton);
-        infoLabelVBox.setSpacing(10);
-
-        return new VBox (
-                new Label("Ajuster la taille de la grille:"),
-                new HBox (rowInputVBox, columnInputVBox, infoLabelVBox)
+        VBox gridSizerVBox = new VBox (
+            ajusterTailleLabel,
+            hBox
         );
-         */
+        gridSizerVBox.setSpacing(5);
+
+        return gridSizerVBox;
     }
 
     // Returns a "widget" for inputting the list of attributes
@@ -183,38 +171,34 @@ public class Generator {
 
         Label definirAttributesLabel = new Label("Définir les attributs:");
         definirAttributesLabel.setId("smallTitle");
-        definirAttributesLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
 
-        VBox makeAttributeGetterVBox = new VBox (
+        VBox attributeGetterVBox = new VBox (
                 definirAttributesLabel,
                 attributeHBox,
                 attributeListView
         );
 
-        makeAttributeGetterVBox.setSpacing(5);
-        makeAttributeGetterVBox.setPadding(new Insets(5,0,0,0));
+        attributeGetterVBox.setSpacing(5);
+        attributeGetterVBox.setPadding(new Insets(5,0,0,0));
 
-        return makeAttributeGetterVBox;
+        return attributeGetterVBox;
     }
 
     // Returns a "widget" for inputting the values of each attribute
     private Node makeAttributeValuesInputter() {
-        Label imageIndicator = new Label(" Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns + ".  ");
+        Label imageIndicator = new Label(" Entrer les valeurs pour l'image (" + (currentImageIndex + 1) + "/" + numRows*numColumns + "): ");
         imageIndicator.setId("smallTitle");
-        imageIndicator.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         VBox singleImageDisplayVbox = new VBox();
         singleImageDisplayVbox.getChildren().setAll(display.getSingleImage(currentImageIndex));
         HashMap<String, TextField> textFieldMap = new HashMap<>();
 
         textFieldMap.put("nom", new TextField());
-
         for (String attribute : attributeList) {
             textFieldMap.put(attribute, new TextField());
         }
 
         Button nextImageButton = new Button("Valider");
         nextImageButton.setId("round-green");
-        nextImageButton.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         nextImageButton.setOnAction(e -> {
             if (processAttributeValueInput(textFieldMap) < 0) {
                 new Alert(Alert.AlertType.WARNING, "Il faut remplir tous les champs!").showAndWait();
@@ -241,7 +225,7 @@ public class Generator {
                         textFieldMap.get(attribute).clear();
                     }
                     singleImageDisplayVbox.getChildren().setAll(display.getSingleImage(currentImageIndex));
-                    imageIndicator.setText("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns);
+                    imageIndicator.setText(" Entrer les valeurs pour l'image (" + (currentImageIndex + 1) + "/" + numRows*numColumns + "): ");
                     if (currentImageIndex + 1 >= (numRows * numColumns)) {
                         nextImageButton.setText("Finir");
                     }
@@ -250,33 +234,30 @@ public class Generator {
             }
         });
 
-        //Borderpane form
-        BorderPane form = new BorderPane();
-        VBox topVBox = new VBox(singleImageDisplayVbox, imageIndicator);
-        singleImageDisplayVbox.setAlignment(Pos.CENTER);
-        Label nomLabel = new Label("nom" + ": ");
+        //GridPane form
+        GridPane form = new GridPane();
+        form.setAlignment(Pos.CENTER);
+        form.setHgap(10);
+        form.setVgap(10);
+        form.setPadding(new Insets(10, 10, 10, 10));
+
+        int currRow = 0;
+        Label nomLabel = new Label("nom: ");
         nomLabel.setId("fontLabel");
-        nomLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
-        VBox leftVBox = new VBox(nomLabel);
-        leftVBox.setAlignment(Pos.CENTER);
-        leftVBox.setSpacing(9);
-        VBox rightVBox = new VBox(textFieldMap.get("nom"));
-        form.setTop(topVBox);
-        for (String attribute : attributeList){
+        form.add(nomLabel, 0, currRow);
+        form.add(textFieldMap.get("nom"), 1, currRow);
+        for (String attribute : attributeList) {
+            currRow++;
             Label attributeLabel = new Label(attribute + ": ");
             attributeLabel.setId("fontLabel");
-            attributeLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
-            leftVBox.getChildren().add(attributeLabel);
-            rightVBox.getChildren().add(textFieldMap.get(attribute));
-            form.setLeft(leftVBox);
-            form.setRight(rightVBox);
-            BorderPane.setMargin(leftVBox, new Insets(10));
-            BorderPane.setMargin(rightVBox, new Insets(10));
+            form.add(attributeLabel, 0, currRow);
+            form.add(textFieldMap.get(attribute), 1, currRow);
         }
-        form.setBottom(nextImageButton);
-        BorderPane.setAlignment(nextImageButton, Pos.CENTER);
 
-        return form;
+        VBox inputterVBox = new VBox(singleImageDisplayVbox, imageIndicator, form, nextImageButton);
+        singleImageDisplayVbox.setAlignment(Pos.CENTER);
+        inputterVBox.setAlignment(Pos.CENTER);
+        return inputterVBox;
     }
 
     // Takes the info from the makeAttributeValuesInputter, checks validity and inserts the values into the possiblites map
@@ -304,6 +285,10 @@ public class Generator {
         Button saveButton = new Button("Enregistrer");
         saveButton.setOnAction(e -> {
             String proposedName = fileNameInput.getText().strip();
+            if (proposedName.length() == 0) {
+                fileNameInput.clear();
+                return;
+            }
             for (CharSequence c : ILLEGAL_CHARACTERS) {
                 if (proposedName.contains(c)) {
                     new Alert(Alert.AlertType.WARNING, "\"" + proposedName + "\" n'est pas un nom de fichier valide car il contient: \"" + c + "\"").showAndWait();
@@ -314,7 +299,7 @@ public class Generator {
                 if (saveJSON(generatorMap, proposedName)) {
                     fileNameInput.setEditable(false);
                     saveButton.setDisable(true);
-                    GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, "Enregistré avec succès sous:\n\"" + proposedName + "\"", proposedName);
+                    GeneratorCompletion generatorCompletion = new GeneratorCompletion(stage, proposedName);
                     generatorCompletion.showGeneratorCompletionStage();
                 }
             } catch (IOException ex) {
@@ -323,7 +308,6 @@ public class Generator {
         });
         Label nommerFichierLabel = new Label("Nommer le fichier: ");
         nommerFichierLabel.setId("smallTitle");
-        nommerFichierLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
 
         return new VBox(
                 nommerFichierLabel,

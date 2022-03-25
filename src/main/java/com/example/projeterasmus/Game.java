@@ -23,7 +23,7 @@ public class Game {
     private String jsonName;
     private int numRows;
     private int numColumns;
-    private int target;
+    private final int target;
     private JsonObject root;
     private HBox guesser;
     private ArrayList<Boolean> crossedOut;
@@ -97,7 +97,7 @@ public class Game {
 
         Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
-        modeLabel = new Label("Mode: " + (autoMode ? "Automatique" : "Manuel"));
+        modeLabel = new Label("Mode: " + "Automatique");
 
         stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
         guessButton.requestFocus();
@@ -168,7 +168,7 @@ public class Game {
     private void constructGuesser() {
         Label poserQuestionLabel = new Label("Poser une question:");
         poserQuestionLabel.setId("smallTitle");
-        poserQuestionLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        poserQuestionLabel.getStylesheets().add("stylesheet.css");
 
         guesser.getChildren().addAll(new VBox(poserQuestionLabel ,
                                             new HBox(new VBox(new Label("Attribut:"), propertySelector),

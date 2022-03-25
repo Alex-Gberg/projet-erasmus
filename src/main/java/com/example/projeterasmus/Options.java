@@ -9,8 +9,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.Objects;
-
 public class Options {
     private final Button optionsButton;
     private final Stage mainStage;
@@ -34,7 +32,7 @@ public class Options {
         buttonsBox.setPadding(new Insets(10,10,10,10));
         buttonsBox.setSpacing(10);
         buttonsBox.setId("backgroundBlack");
-        buttonsBox.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        buttonsBox.getStylesheets().add("stylesheet.css");
 
         optionsMenuStage.setScene(new Scene(buttonsBox));
 

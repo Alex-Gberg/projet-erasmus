@@ -7,9 +7,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 public class Save {
-    public String generator;
-    public int target;
-    public ArrayList<Boolean> crossedOut;
+    private final String generator;
+    private final int target;
+    private final ArrayList<Boolean> crossedOut;
 
     public Save(String generator, int target, ArrayList<Boolean> crossedOut) {
         this.generator = generator;

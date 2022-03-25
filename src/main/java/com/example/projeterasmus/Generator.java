@@ -213,6 +213,8 @@ public class Generator {
         }
 
         Button nextImageButton = new Button("Valider");
+        nextImageButton.setId("round-green");
+        nextImageButton.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         nextImageButton.setOnAction(e -> {
             if (processAttributeValueInput(textFieldMap) < 0) {
                 new Alert(Alert.AlertType.WARNING, "Il faut remplir tous les champs!").showAndWait();
@@ -251,6 +253,7 @@ public class Generator {
         //Borderpane form
         BorderPane form = new BorderPane();
         VBox topVBox = new VBox(singleImageDisplayVbox, imageIndicator);
+        singleImageDisplayVbox.setAlignment(Pos.CENTER);
         Label nomLabel = new Label("nom" + ": ");
         nomLabel.setId("fontLabel");
         nomLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
@@ -271,6 +274,7 @@ public class Generator {
             BorderPane.setMargin(rightVBox, new Insets(10));
         }
         form.setBottom(nextImageButton);
+        BorderPane.setAlignment(nextImageButton, Pos.CENTER);
 
         return form;
     }
@@ -317,9 +321,12 @@ public class Generator {
                 ex.printStackTrace();
             }
         });
+        Label nommerFichierLabel = new Label("Nommer le fichier: ");
+        nommerFichierLabel.setId("smallTitle");
+        nommerFichierLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
 
         return new VBox(
-                new Label("Nommer le fichier: "),
+                nommerFichierLabel,
                 new HBox(fileNameInput, saveButton)
         );
     }

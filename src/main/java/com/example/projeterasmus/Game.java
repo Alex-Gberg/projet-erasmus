@@ -166,7 +166,11 @@ public class Game {
     }
 
     private void constructGuesser() {
-        guesser.getChildren().addAll(new VBox(new Label("Poser une question:"),
+        Label poserQuestionLabel = new Label("Poser une question:");
+        poserQuestionLabel.setId("smallTitle");
+        poserQuestionLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+
+        guesser.getChildren().addAll(new VBox(poserQuestionLabel ,
                                             new HBox(new VBox(new Label("Attribut:"), propertySelector),
                                                     new VBox(new Label("Valeur:"), valueSelector),
                                                     new VBox(guessResult, guessButton))));

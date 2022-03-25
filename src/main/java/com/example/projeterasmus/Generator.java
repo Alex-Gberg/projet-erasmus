@@ -4,9 +4,11 @@ import com.google.gson.Gson;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -122,8 +124,12 @@ public class Generator {
         HBox hBox = new HBox(rowInputVBox, columnInputVBox, infoLabelVBox);
         hBox.setSpacing(5);
 
+        Label ajusterTailleLabel = new Label("Ajuster la taille de la grille:");
+        ajusterTailleLabel.setId("smallTitle");
+        ajusterTailleLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+
         VBox makeGridSizer = new VBox (
-                new Label("Ajuster la taille de la grille:"),
+                ajusterTailleLabel,
                 hBox
                 );
          makeGridSizer.setSpacing(5);
@@ -175,8 +181,12 @@ public class Generator {
         HBox attributeHBox = new HBox(attributeInput, addAttribute, removeAttribute);
         attributeHBox.setSpacing(5);
 
+        Label definirAttributesLabel = new Label("Définir les attributs:");
+        definirAttributesLabel.setId("smallTitle");
+        definirAttributesLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+
         VBox makeAttributeGetterVBox = new VBox (
-                new Label("Définir les attributs:"),
+                definirAttributesLabel,
                 attributeHBox,
                 attributeListView
         );
@@ -189,7 +199,9 @@ public class Generator {
 
     // Returns a "widget" for inputting the values of each attribute
     private Node makeAttributeValuesInputter() {
-        Label imageIndicator = new Label("Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns);
+        Label imageIndicator = new Label(" Entrer les valeurs pour l'image numéro " + (currentImageIndex + 1) + "/" + numRows*numColumns + ".  ");
+        imageIndicator.setId("smallTitle");
+        imageIndicator.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
         VBox singleImageDisplayVbox = new VBox();
         singleImageDisplayVbox.getChildren().setAll(display.getSingleImage(currentImageIndex));
         HashMap<String, TextField> textFieldMap = new HashMap<>();
@@ -236,12 +248,30 @@ public class Generator {
             }
         });
 
-        VBox form = new VBox(singleImageDisplayVbox, imageIndicator);
-        form.getChildren().add(new HBox(new Label("nom" + ": "), textFieldMap.get("nom")));
-        for (String attribute : attributeList) {
-            form.getChildren().add(new HBox(new Label(attribute + ": "), textFieldMap.get(attribute)));
+        //Borderpane form
+        BorderPane form = new BorderPane();
+        VBox topVBox = new VBox(singleImageDisplayVbox, imageIndicator);
+        Label nomLabel = new Label("nom" + ": ");
+        nomLabel.setId("fontLabel");
+        nomLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+        VBox leftVBox = new VBox(nomLabel);
+        leftVBox.setAlignment(Pos.CENTER);
+        leftVBox.setSpacing(9);
+        VBox rightVBox = new VBox(textFieldMap.get("nom"));
+        form.setTop(topVBox);
+        for (String attribute : attributeList){
+            Label attributeLabel = new Label(attribute + ": ");
+            attributeLabel.setId("fontLabel");
+            attributeLabel.getStylesheets().add(Objects.requireNonNull(getClass().getClassLoader().getResource("stylesheet.css")).toExternalForm());
+            leftVBox.getChildren().add(attributeLabel);
+            rightVBox.getChildren().add(textFieldMap.get(attribute));
+            form.setLeft(leftVBox);
+            form.setRight(rightVBox);
+            BorderPane.setMargin(leftVBox, new Insets(10));
+            BorderPane.setMargin(rightVBox, new Insets(10));
         }
-        form.getChildren().add(nextImageButton);
+        form.setBottom(nextImageButton);
+
         return form;
     }
 

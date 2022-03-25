@@ -72,6 +72,10 @@
     -fx-pref-width: 200px;
 }
 
+#monospace{
+    -fx-font-family: "monospace";
+}
+
 
 
 #tradeMarkLabel{
@@ -105,4 +109,13 @@
 
 #label-white{
     -fx-text-fill: white;
+}
+
+#smallTitle{
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+#fontLabel{
+    -fx-font-size: 15px;
 }

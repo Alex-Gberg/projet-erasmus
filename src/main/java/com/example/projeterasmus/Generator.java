@@ -286,6 +286,7 @@ public class Generator {
         saveButton.setOnAction(e -> {
             String proposedName = fileNameInput.getText().strip();
             if (proposedName.length() == 0) {
+                new Alert(Alert.AlertType.WARNING, "Saisissez un nom de fichier à enregistrer").showAndWait();
                 fileNameInput.clear();
                 return;
             }

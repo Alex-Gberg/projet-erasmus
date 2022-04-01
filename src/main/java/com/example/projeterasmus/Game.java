@@ -95,9 +95,7 @@ public class Game {
         guessResult = new Label();
         constructGuesser();
 
-        //TODO Adding Button for extension
         Button solvingAlgorithmButton = new Button("Algorithm to solve Game");
-
 
         Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
@@ -183,4 +181,25 @@ public class Game {
     public String getJsonName() { return jsonName; }
 
     public boolean getAutoMode() { return autoMode; }
+
+    private HashMap<ArrayList<String>, Integer> countRemainingAttributeOccurences() {
+        JsonObject pers = root.getAsJsonObject("possibilites");
+        HashMap<ArrayList<String>, Integer> map = new HashMap<>();
+        for (int i = 0; i < numRows * numColumns; i++) {
+            if (!crossedOut.get(i)) {
+                for (String attribute : propertyMap.keySet()) {
+                    if (!attribute.equals("nom")) {
+                        String value = pers.getAsJsonObject(String.valueOf(i)).get(attribute).getAsString();
+                        ArrayList<String> key = new ArrayList<>(Arrays.asList(attribute, value));
+                        if (map.containsKey(key)) {
+                            map.replace(key, map.get(key) + 1);
+                        } else {
+                            map.put(new ArrayList<>(Arrays.asList(attribute, value)), 1);
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
 }

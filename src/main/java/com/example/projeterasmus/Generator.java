@@ -28,10 +28,10 @@ public class Generator {
     private  VBox mainVBox;
     private final Button optionButton;
     private final Display display;
+    private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
     private final Node fileNamer;
     private int currentImageIndex;
 
-    private static final CharSequence[] ILLEGAL_CHARACTERS = { "/", "\n", "\r", "\t", "\0", "\f", "`", "?", "*", "\\", "<", ">", "|", "\"", ":" };
     private ObservableList<String> attributeList;
     private TreeMap<String, HashMap<String, String>> possibilites;
     private HashMap<String, ? super Object> generatorMap;

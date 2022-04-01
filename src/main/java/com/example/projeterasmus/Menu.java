@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -125,6 +126,13 @@ public class Menu {
         quitGameButton.setId("round-red");
         quitGameButton.setOnAction(e -> stage.close());
 
+        //Extension 2 Players Button
+        Label twoPlayerLabel = new Label("Extension spéciale: Jouer à 2 joueurs");
+        twoPlayerLabel.setId("label-white");
+
+        Button twoPlayerButton = new Button("Jouer à 2 joueurs");
+        twoPlayerButton.setId("round-blue");
+
         // Create Borderpane Layout
         BorderPane borderPane = new BorderPane();
         borderPane.setId("pane");
@@ -146,7 +154,7 @@ public class Menu {
         buttonsBoxMiddle.setSpacing(10);
         buttonsBoxMiddle.setAlignment(Pos.CENTER);
         buttonsBoxMiddle.setPadding(new Insets(10,0,50,0));
-        buttonsBoxMiddle.getChildren().add(quitGameButton);
+        buttonsBoxMiddle.getChildren().addAll(twoPlayerLabel, twoPlayerButton, quitGameButton);
 
         // HBox
         HBox leftBottom = new HBox();
@@ -167,7 +175,7 @@ public class Menu {
         borderPane2.setBottom(borderPane);
         borderPane2.setId("pane2");
 
-        Scene scene = new Scene(borderPane2, 550, 450);
+        Scene scene = new Scene(borderPane2, 550, 520);
         scene.getStylesheets().add("stylesheet.css");
         stage.setScene(scene);
     }

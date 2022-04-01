@@ -119,3 +119,8 @@
 #fontLabel{
     -fx-font-size: 15px;
 }
+
+#meilleureQuestionPoser{
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}

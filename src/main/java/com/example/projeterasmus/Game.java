@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -100,6 +102,8 @@ public class Game {
         constructGuesser();
 
         Button solvingAlgorithmButton = new Button("Meilleure question à poser");
+        solvingAlgorithmLabel.setId("meilleureQuestionPoser");
+        solvingAlgorithmLabel.getStylesheets().add("stylesheet.css");
         solvingAlgorithmButton.setOnAction(e -> {
             ArrayList<String> res = algoChoice(countRemainingAttributeOccurences());
             solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
@@ -110,7 +114,12 @@ public class Game {
         autoMode = true;
         modeLabel = new Label("Mode: " + "Automatique");
 
-        stage.setScene(new Scene(new VBox(new HBox(new VBox(optionButton, modeLabel), solvingAlgorithmButton, solvingAlgorithmLabel) , display.getDisplay(), guesser)));
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10, 10, 10, 10));
+        borderPane.setLeft(new VBox(optionButton, modeLabel));
+        borderPane.setRight(new VBox(solvingAlgorithmButton, solvingAlgorithmLabel));
+
+        stage.setScene(new Scene(new VBox(new VBox(borderPane , display.getDisplay(), guesser))));
         guessButton.requestFocus();
     }
 
@@ -241,6 +250,4 @@ public class Game {
 
         return result;
     }
-
-
 }

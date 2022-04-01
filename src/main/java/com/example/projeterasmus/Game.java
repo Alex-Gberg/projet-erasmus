@@ -95,11 +95,15 @@ public class Game {
         guessResult = new Label();
         constructGuesser();
 
+        //TODO Adding Button for extension
+        Button solvingAlgorithmButton = new Button("Algorithm to solve Game");
+
+
         Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
         modeLabel = new Label("Mode: " + "Automatique");
 
-        stage.setScene(new Scene(new VBox(new VBox(optionButton, modeLabel) , display.getDisplay(), guesser)));
+        stage.setScene(new Scene(new VBox(new HBox(new VBox(optionButton, modeLabel), solvingAlgorithmButton) , display.getDisplay(), guesser)));
         guessButton.requestFocus();
     }
 

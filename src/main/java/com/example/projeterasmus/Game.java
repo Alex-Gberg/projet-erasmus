@@ -89,17 +89,21 @@ public class Game {
         valueSelector = new ComboBox<>();
         valueSelector.setPromptText("Choisir une valeur");
         propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
+        Label solvingAlgorithmLabel = new Label();
         guessButton = new Button("Interroger!");
         guessButton.setDefaultButton(true);
-        guessButton.setOnAction(e -> processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem()));
+        guessButton.setOnAction(e -> {
+            processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem());
+            solvingAlgorithmLabel.setText("");
+        });
         guessResult = new Label();
         constructGuesser();
 
         Button solvingAlgorithmButton = new Button("Meilleure question à poser");
-        Label solvingAlgorithmLabel = new Label();
         solvingAlgorithmButton.setOnAction(e -> {
             ArrayList<String> res = algoChoice(countRemainingAttributeOccurences());
             solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
+            stage.sizeToScene();
         });
 
         Button optionButton = new Options(stage, this).getOptionsButton();
@@ -237,4 +241,6 @@ public class Game {
 
         return result;
     }
+
+
 }

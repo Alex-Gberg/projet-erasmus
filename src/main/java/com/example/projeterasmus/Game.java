@@ -95,13 +95,18 @@ public class Game {
         guessResult = new Label();
         constructGuesser();
 
-        Button solvingAlgorithmButton = new Button("Algorithm to solve Game");
+        Button solvingAlgorithmButton = new Button("Meilleure question à poser");
+        Label solvingAlgorithmLabel = new Label();
+        solvingAlgorithmButton.setOnAction(e -> {
+            ArrayList<String> res = algoChoice(countRemainingAttributeOccurences());
+            solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
+        });
 
         Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
         modeLabel = new Label("Mode: " + "Automatique");
 
-        stage.setScene(new Scene(new VBox(new HBox(new VBox(optionButton, modeLabel), solvingAlgorithmButton) , display.getDisplay(), guesser)));
+        stage.setScene(new Scene(new VBox(new HBox(new VBox(optionButton, modeLabel), solvingAlgorithmButton, solvingAlgorithmLabel) , display.getDisplay(), guesser)));
         guessButton.requestFocus();
     }
 
@@ -201,5 +206,35 @@ public class Game {
             }
         }
         return map;
+    }
+
+    private ArrayList<String> algoChoice(HashMap<ArrayList<String>, Integer> algoHashMap){
+        //Check how many names are remaining
+        int remaining = 0;
+        int lastFalse = -1;
+        for (int i = 0; i < crossedOut.size(); i++) {
+            if (crossedOut.get(i).equals(false)) {
+                remaining++;
+                lastFalse = i;
+            }
+        }
+
+        if (remaining == 1){
+            return new ArrayList<String>(Arrays.asList("nom", root.get("possibilites").getAsJsonObject().get(String.valueOf(lastFalse)).getAsJsonObject().get("nom").getAsString()));
+        }
+
+        //Select question for algorithm to take
+        //Integer division
+        double half = remaining / 2.0;
+        double bestDistance = Double.MAX_VALUE;
+        ArrayList<String> result = new ArrayList<String>();
+        for (ArrayList<String> key : algoHashMap.keySet()){
+            if (Math.abs(algoHashMap.get(key) - half) < bestDistance){
+                bestDistance = Math.abs(algoHashMap.get(key) - half);
+                result = key;
+            }
+        }
+
+        return result;
     }
 }

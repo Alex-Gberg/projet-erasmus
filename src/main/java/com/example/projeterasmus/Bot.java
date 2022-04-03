@@ -22,13 +22,14 @@ public class Bot {
     }
 
     public void playTurn() {
-        ArrayList<String> qToAsk = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, crossedOut), crossedOut, jsonRoot);
-        if (qToAsk.get(0).equals("nom")) {
-            System.out.println("The bot thinks it is: " + qToAsk.get(1));
-            found = true;
-        }
-        else {
-            processGuess(qToAsk.get(0), qToAsk.get(1));
+        if (!found) {
+            ArrayList<String> qToAsk = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, crossedOut), crossedOut, jsonRoot);
+            if (qToAsk.get(0).equals("nom")) {
+                System.out.println("Bot: Found -> " + qToAsk.get(1));
+                found = true;
+            } else {
+                processGuess(qToAsk.get(0), qToAsk.get(1));
+            }
         }
     }
 
@@ -36,6 +37,7 @@ public class Bot {
         JsonObject pers = jsonRoot.getAsJsonObject("possibilites");
 
         boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
+        System.out.println("Bot: Guess -> " + property + ": " + value + " ==> Response -> " + response);
 
         for (int i = 0; i < numPics; i++) {
             if (!crossedOut.get(i)) {

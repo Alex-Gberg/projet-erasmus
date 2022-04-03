@@ -9,6 +9,7 @@ Veuillez trouver ci-dessous les instructions pour lancer et jouer le jeu Qui-est
 * [Comment exécuter le programme](#comment-exécuter-le-programme)
 * [Comment jouer](#comment-jouer)
 * [Comment générer un jeu](#comment-générer-un-jeu)
+* [Comment jouer contre l'ordinateur](#comment-jouer-contre-l'ordinateur)
 
 ## Conditions
 - Java 11
@@ -44,4 +45,13 @@ Veuillez trouver ci-dessous les instructions pour lancer et jouer le jeu Qui-est
 - Après avoir entré toutes les valeurs et si les valeurs données sont valides, vous serez invité à nommer et enregistrer le fichier
 - Vous aurez la possibilité de jouer immédiatement à votre nouveau jeu ou vous pourrez y accéder depuis le menu principal où il apparaîtra dans la liste `Choisir le type de caractères`
 
+## Comment jouer contre l'ordinateur
+- Depuis le menu principal, choisissez avec quel type de personnages vous voulez jouer
+- Appuyez sur le bouton `Jouer contre l'ordi`
+- Dans ce mode l'ordinateur cherche le même personnage que vous et votre but est de le trouver avant lui
+- Vous pouvez voir la progression de l'ordi dans la section `La progression de votre adversaire`
+- Si l'ordinateur a trouvé qui c'est, il vous le dira mais vous pouvez continuer à jouer
+- Vous pouvez sauvegarder la partie depuis le menu `Options`
+- Votre progression et celle de l'ordinateur sont enregistrées
+- Vous pouvez profiter du même algorithme que l'ordinateur en appuyant sur le bouton `Meilleure question à poser`, qui vous donnera l'attribut et la valeur optimale à poser
 

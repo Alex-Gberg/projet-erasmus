@@ -125,7 +125,7 @@ public class Game {
         JsonObject pers = jsonRoot.getAsJsonObject("possibilites");
 
         boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
-        System.out.println("Guess -> " + property + ": " + value + " ==> Response -> " + response);
+        System.out.println("User: Guess -> " + property + ": " + value + " ==> Response -> " + response);
 
         if (autoMode) {
             for (int i = 0; i < numRows * numColumns; i++) {
@@ -141,6 +141,7 @@ public class Game {
 
         if (property.equals("nom") && response) {
             new Congratulations(stage);
+            System.out.println("User: Found -> " + value);
         }
 
         return response;

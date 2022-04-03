@@ -1,9 +1,6 @@
-#pane2{
+#pane{
     -fx-background-image: url("Guess_Who_Background.png");
     -fx-background-size: 553 520;
-}
-
-#pane{
     -fx-background-color: transparent;
     -fx-background-color: none;
     -fx-background-color: transparent !important;

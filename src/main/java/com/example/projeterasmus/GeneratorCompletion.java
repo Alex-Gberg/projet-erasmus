@@ -34,7 +34,7 @@ public class GeneratorCompletion {
         Button startGameButton = new Button("Commencer le jeu");
         startGameButton.setId("round-green");
         startGameButton.setOnAction(e -> {
-            new Game(mainStage, jsonFileName + ".json");
+            new Game(mainStage, jsonFileName + ".json", false);
             GeneratorCompletionStage.close();
         });
 

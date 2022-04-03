@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -17,65 +16,79 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.Set;
 
 public class Game {
     private Stage stage;
     private Display display;
+    private boolean vsComputer;
+    private Bot bot;
     private String jsonName;
     private int numRows;
     private int numColumns;
     private final int target;
-    private JsonObject root;
-    private HBox guesser;
+    private JsonObject jsonRoot;
     private ArrayList<Boolean> crossedOut;
     private HashMap<String, Set<String>> propertyMap;
-    private ComboBox<String> propertySelector;
-    private ComboBox<String> valueSelector;
-    private Button guessButton;
-    private Label guessResult;
+    private Label solvingAlgorithmLabel;
+    private VBox botInfo;
     private boolean autoMode;
     private Label modeLabel;
 
-    public Game(Stage stage, String jsonName) {
-        auxConstructor(stage, jsonName);
+    public Game(Stage stage, String jsonName, boolean vsComputer) {
+        auxConstructor(stage, jsonName, vsComputer);
 
         crossedOut = new ArrayList<>();
         for (int i = 0; i < numRows*numColumns; i++) { crossedOut.add(false); }
 
         Random rand = new Random();
         target = rand.nextInt(numRows*numColumns);
+        System.out.println("The target is " + target + ": "+ jsonRoot.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
 
-        System.out.println("The target is " + target + ": "+ root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
+        if (vsComputer) {
+            this.bot = new Bot(jsonRoot, target, false, new ArrayList<>(crossedOut));
+            botInfo.getChildren().setAll(bot.getBotInfo());
+        }
+
+        stage.sizeToScene();
     }
 
-    public Game(Stage stage, String jsonName, int target, ArrayList<Boolean> crossedOut) {
-        auxConstructor(stage, jsonName);
+    public Game(Stage stage, String jsonName, int target, ArrayList<Boolean> playerCrossedOut, boolean vsComputer, boolean compFound, ArrayList<Boolean> compCrossedOut) {
+        auxConstructor(stage, jsonName, vsComputer);
 
-        this.crossedOut = crossedOut;
-
+        this.crossedOut = playerCrossedOut;
         this.target = target;
-
-        System.out.println("The target is " + target + ": "+ root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
+        System.out.println("The target is " + target + ": "+ jsonRoot.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(target)).get("nom").getAsString());
 
         for (int i = 0; i < crossedOut.size(); i++) {
             if (crossedOut.get(i)) {
                 display.crossOutPicAuto(i, false);
             }
         }
+
+        if (vsComputer) {
+            bot = new Bot(jsonRoot, target, compFound, compCrossedOut);
+            botInfo = bot.getBotInfo();
+        }
+
+        stage.sizeToScene();
     }
 
-    private void auxConstructor(Stage stage, String jsonName) {
+    private void auxConstructor(Stage stage, String jsonName, boolean vsComputer) {
         this.stage = stage;
+        this.vsComputer = vsComputer;
         this.jsonName = jsonName;
         String path = "src/main/resources/JSON/" + jsonName;
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
             Gson gson = new Gson();
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
-            root = json.getAsJsonObject();
-            numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("colonne").getAsInt();
+            jsonRoot = json.getAsJsonObject();
+            numRows = jsonRoot.get("ligne").getAsInt();
+            numColumns = jsonRoot.get("colonne").getAsInt();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -83,76 +96,36 @@ public class Game {
 
         display = new Display(this);
 
-        propertyMap = findProperties(root);
-
-        guesser = new HBox();
-        propertySelector = new ComboBox<>(FXCollections.observableArrayList(propertyMap.keySet()));
-        propertySelector.setPromptText("Choisir un attribut");
-        valueSelector = new ComboBox<>();
-        valueSelector.setPromptText("Choisir une valeur");
-        propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
-        Label solvingAlgorithmLabel = new Label();
-        guessButton = new Button("Interroger!");
-        guessButton.setDefaultButton(true);
-        guessButton.setOnAction(e -> {
-            processGuess(propertySelector.getSelectionModel().getSelectedItem(), valueSelector.getSelectionModel().getSelectedItem());
-            solvingAlgorithmLabel.setText("");
-        });
-        guessResult = new Label();
-        constructGuesser();
-
-        Button solvingAlgorithmButton = new Button("Meilleure question à poser");
-        solvingAlgorithmLabel.setId("meilleureQuestionPoser");
-        solvingAlgorithmLabel.getStylesheets().add("stylesheet.css");
-        solvingAlgorithmButton.setOnAction(e -> {
-            ArrayList<String> res = algoChoice(countRemainingAttributeOccurences());
-            solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
-            stage.sizeToScene();
-        });
-
         Button optionButton = new Options(stage, this).getOptionsButton();
         autoMode = true;
         modeLabel = new Label("Mode: " + "Automatique");
 
+        Button solvingAlgorithmButton = new Button("Meilleure question à poser");
+        solvingAlgorithmLabel = new Label();
+        solvingAlgorithmLabel.setId("meilleureQuestionPoser");
+        solvingAlgorithmLabel.getStylesheets().add("stylesheet.css");
+        solvingAlgorithmButton.setOnAction(e -> {
+            ArrayList<String> res = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, numRows*numColumns, crossedOut), crossedOut, jsonRoot);
+            solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
+            stage.sizeToScene();
+        });
+
         BorderPane borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(10, 10, 10, 10));
         borderPane.setLeft(new VBox(optionButton, modeLabel));
         borderPane.setRight(new VBox(solvingAlgorithmButton, solvingAlgorithmLabel));
 
-        stage.setScene(new Scene(new VBox(new VBox(borderPane , display.getDisplay(), guesser))));
-        guessButton.requestFocus();
+        botInfo = new VBox();
+
+        propertyMap = GameUtils.findProperties(jsonRoot, numRows*numColumns);
+
+        stage.setScene(new Scene(new VBox(new VBox(borderPane, display.getDisplay(), botInfo, constructGuesser()))));
     }
 
-    private HashMap<String, Set<String>> findProperties(JsonObject root) {
-        Set<String> propSet = new HashSet<>(root.getAsJsonObject("possibilites").getAsJsonObject("0").keySet());
-        propSet.remove("fichier");
-        HashMap<String, Set<String>> map = new HashMap<>();
-        for (String s : propSet) {
-            map.put(s, new HashSet<>());
-        }
-
-        JsonObject pers = root.getAsJsonObject("possibilites");
-        for (int i = 0; i < numRows*numColumns; i++) {
-            for (String s : propSet) {
-                map.get(s).add(pers.getAsJsonObject(String.valueOf(i)).get(s).getAsString());
-            }
-        }
-        return map;
-    }
-
-    private void processGuess(String property, String value) {
-        if (property == null || value == null) {
-            guessResult.setText("Entrée invalide");
-            return;
-        }
-
-        JsonObject pers = root.getAsJsonObject("possibilites");
+    private boolean processGuess(String property, String value) {
+        JsonObject pers = jsonRoot.getAsJsonObject("possibilites");
 
         boolean response = value.equals(pers.getAsJsonObject(String.valueOf(target)).get(property).getAsString());
-
-        guessResult.setText("Réponse: " + (response ? "Oui!" : "Non"));
-
-        System.out.println("Guess -> " + property + ": " + value + "\nResponse -> " + response);
+        System.out.println("Guess -> " + property + ": " + value + " ==> Response -> " + response);
 
         if (autoMode) {
             for (int i = 0; i < numRows * numColumns; i++) {
@@ -169,6 +142,8 @@ public class Game {
         if (property.equals("nom") && response) {
             new Congratulations(stage);
         }
+
+        return response;
     }
 
     public void toggleCrossedOut(int i) {
@@ -181,11 +156,39 @@ public class Game {
     }
 
     public void save() {
-        Save save = new Save(jsonName, target, crossedOut);
+        ArrayList<Boolean> botCrossedOut = vsComputer ? bot.getCrossedOut() : new ArrayList<>();
+        boolean botFound = vsComputer && bot.getFound();
+
+        Save save = new Save(jsonName, target, crossedOut, vsComputer, botFound, botCrossedOut);
         save.saveToFile();
     }
 
-    private void constructGuesser() {
+    private HBox constructGuesser() {
+        HBox guesser = new HBox();
+        ComboBox<String> propertySelector = new ComboBox<>(FXCollections.observableArrayList(propertyMap.keySet()));
+        propertySelector.setPromptText("Choisir un attribut");
+        ComboBox<String> valueSelector = new ComboBox<>();
+        valueSelector.setPromptText("Choisir une valeur");
+        propertySelector.setOnAction(e -> valueSelector.setItems(FXCollections.observableArrayList(propertyMap.get(propertySelector.getSelectionModel().getSelectedItem()))));
+        Label guessResult = new Label();
+        Button guessButton = new Button("Interroger!");
+        guessButton.setDefaultButton(true);
+        guessButton.setOnAction(e -> {
+            String property = propertySelector.getSelectionModel().getSelectedItem();
+            String value = valueSelector.getSelectionModel().getSelectedItem();
+            if (property == null || value == null) {
+                guessResult.setText("Entrée invalide");
+                return;
+            }
+            guessResult.setText("Réponse: " + (processGuess(property, value) ? "Oui!" : "Non"));
+            if (vsComputer) {
+                bot.playTurn();
+                botInfo = bot.getBotInfo();
+            }
+            solvingAlgorithmLabel.setText("");
+            stage.sizeToScene();
+        });
+
         Label poserQuestionLabel = new Label("Poser une question:");
         poserQuestionLabel.setId("smallTitle");
         poserQuestionLabel.getStylesheets().add("stylesheet.css");
@@ -194,60 +197,10 @@ public class Game {
                                             new HBox(new VBox(new Label("Attribut:"), propertySelector),
                                                     new VBox(new Label("Valeur:"), valueSelector),
                                                     new VBox(guessResult, guessButton))));
+        return guesser;
     }
 
     public String getJsonName() { return jsonName; }
 
     public boolean getAutoMode() { return autoMode; }
-
-    private HashMap<ArrayList<String>, Integer> countRemainingAttributeOccurences() {
-        JsonObject pers = root.getAsJsonObject("possibilites");
-        HashMap<ArrayList<String>, Integer> map = new HashMap<>();
-        for (int i = 0; i < numRows * numColumns; i++) {
-            if (!crossedOut.get(i)) {
-                for (String attribute : propertyMap.keySet()) {
-                    if (!attribute.equals("nom")) {
-                        String value = pers.getAsJsonObject(String.valueOf(i)).get(attribute).getAsString();
-                        ArrayList<String> key = new ArrayList<>(Arrays.asList(attribute, value));
-                        if (map.containsKey(key)) {
-                            map.replace(key, map.get(key) + 1);
-                        } else {
-                            map.put(new ArrayList<>(Arrays.asList(attribute, value)), 1);
-                        }
-                    }
-                }
-            }
-        }
-        return map;
-    }
-
-    private ArrayList<String> algoChoice(HashMap<ArrayList<String>, Integer> algoHashMap){
-        //Check how many names are remaining
-        int remaining = 0;
-        int lastFalse = -1;
-        for (int i = 0; i < crossedOut.size(); i++) {
-            if (crossedOut.get(i).equals(false)) {
-                remaining++;
-                lastFalse = i;
-            }
-        }
-
-        if (remaining == 1){
-            return new ArrayList<String>(Arrays.asList("nom", root.get("possibilites").getAsJsonObject().get(String.valueOf(lastFalse)).getAsJsonObject().get("nom").getAsString()));
-        }
-
-        //Select question for algorithm to take
-        //Integer division
-        double half = remaining / 2.0;
-        double bestDistance = Double.MAX_VALUE;
-        ArrayList<String> result = new ArrayList<String>();
-        for (ArrayList<String> key : algoHashMap.keySet()){
-            if (Math.abs(algoHashMap.get(key) - half) < bestDistance){
-                bestDistance = Math.abs(algoHashMap.get(key) - half);
-                result = key;
-            }
-        }
-
-        return result;
-    }
 }

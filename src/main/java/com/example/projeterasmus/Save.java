@@ -9,12 +9,18 @@ import java.util.ArrayList;
 public class Save {
     public String generator;
     public int target;
-    public ArrayList<Boolean> crossedOut;
+    public ArrayList<Boolean> playerCrossedOut;
+    public boolean vsComputer;
+    public boolean compFound;
+    public ArrayList<Boolean> compCrossedOut;
 
-    public Save(String generator, int target, ArrayList<Boolean> crossedOut) {
+    public Save(String generator, int target, ArrayList<Boolean> playerCrossedOut, boolean vsComputer, boolean compFound, ArrayList<Boolean> compCrossedOut) {
         this.generator = generator;
         this.target = target;
-        this.crossedOut = crossedOut;
+        this.playerCrossedOut = playerCrossedOut;
+        this.vsComputer = vsComputer;
+        this.compFound = compFound;
+        this.compCrossedOut = compCrossedOut;
     }
 
     public void saveToFile() {

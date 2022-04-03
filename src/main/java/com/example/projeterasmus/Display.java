@@ -31,7 +31,7 @@ import static java.lang.Math.sqrt;
 
 public class Display {
     private Game game;
-    private JsonObject root;
+    private JsonObject jsonRoot;
     private int numPics;
     private int numRows;
     private int numColumns;
@@ -48,16 +48,16 @@ public class Display {
 
             Gson gson = new Gson();
             JsonElement json = gson.fromJson(bufferedReader, JsonElement.class);
-            root = json.getAsJsonObject();
-            numRows = root.get("ligne").getAsInt();
-            numColumns = root.get("colonne").getAsInt();
-            imageFolder = root.get("images").getAsString(); //Path to imageFolder
+            jsonRoot = json.getAsJsonObject();
+            numRows = jsonRoot.get("ligne").getAsInt();
+            numColumns = jsonRoot.get("colonne").getAsInt();
+            imageFolder = jsonRoot.get("images").getAsString(); //Path to imageFolder
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        numPics = loadPics(root);
+        numPics = loadPics(jsonRoot);
     }
 
     // Create display based on the name of a folder of images
@@ -72,8 +72,8 @@ public class Display {
     }
 
     // Load images based on a JSON
-    private int loadPics(JsonObject root) {
-        JsonObject pers = root.getAsJsonObject("possibilites"); // All the stuff in personnage
+    private int loadPics(JsonObject jsonRoot) {
+        JsonObject pers = jsonRoot.getAsJsonObject("possibilites"); // All the stuff in personnage
         for (int i = 0; i < numRows*numColumns; i++) {
             JsonObject obj = pers.getAsJsonObject(String.valueOf(i));
             File file = new File(imageFolder + obj.get("fichier").getAsString());
@@ -115,7 +115,7 @@ public class Display {
 
     // Cross out a picture based on its index
     public void crossOutPicAuto(int index, boolean updateCrossedOut) {
-        String PNGName = root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
+        String PNGName = jsonRoot.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
         Group crossedOut = crossOut(imageFolder + PNGName);
         crossedOut.setOnMouseClicked((MouseEvent e) -> {
             Group g = (Group) e.getSource();
@@ -132,7 +132,7 @@ public class Display {
         if (game.getAutoMode()) { return; }
         int index = nodes.indexOf(node);
         if (node instanceof ImageView) {
-            String PNGName = root.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
+            String PNGName = jsonRoot.getAsJsonObject("possibilites").getAsJsonObject(String.valueOf(index)).get("fichier").getAsString();
             Group crossedOut = crossOut(imageFolder + PNGName);
             crossedOut.setOnMouseClicked((MouseEvent e) -> {
                 Group g = (Group) e.getSource();

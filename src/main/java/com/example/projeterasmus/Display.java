@@ -174,7 +174,7 @@ public class Display {
         return display;
     }
 
-    public int[] getNumRowsCols() { return new int[]{ numRows, numColumns}; }
+    public int[] getNumRowsCols() { return new int[]{ numRows, numColumns }; }
 
     public void changeRowColumns(int newRows, int newColumns) {
         numRows = newRows;

@@ -7,10 +7,10 @@ import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 
 public class Bot {
-    JsonObject jsonRoot;
-    int target;
+    final JsonObject jsonRoot;
+    final int target;
     ArrayList<Boolean> crossedOut;
-    int numPics;
+    final int numPics;
     boolean found;
 
     public Bot(JsonObject jsonRoot, int target, boolean found, ArrayList<Boolean> crossedOut) {
@@ -22,7 +22,7 @@ public class Bot {
     }
 
     public void playTurn() {
-        ArrayList<String> qToAsk = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, numPics, crossedOut), crossedOut, jsonRoot);
+        ArrayList<String> qToAsk = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, crossedOut), crossedOut, jsonRoot);
         if (qToAsk.get(0).equals("nom")) {
             System.out.println("The bot thinks it is: " + qToAsk.get(1));
             found = true;

@@ -71,7 +71,7 @@ public class Game {
 
         if (vsComputer) {
             bot = new Bot(jsonRoot, target, compFound, compCrossedOut);
-            botInfo = bot.getBotInfo();
+            botInfo.getChildren().setAll(bot.getBotInfo());
         }
 
         stage.sizeToScene();
@@ -105,7 +105,7 @@ public class Game {
         solvingAlgorithmLabel.setId("meilleureQuestionPoser");
         solvingAlgorithmLabel.getStylesheets().add("stylesheet.css");
         solvingAlgorithmButton.setOnAction(e -> {
-            ArrayList<String> res = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, numRows*numColumns, crossedOut), crossedOut, jsonRoot);
+            ArrayList<String> res = GameUtils.algoChoice(GameUtils.getAttributeFrequency(jsonRoot, crossedOut), crossedOut, jsonRoot);
             solvingAlgorithmLabel.setText("Attribut: " + res.get(0) + ", valeur: " + res.get(1));
             stage.sizeToScene();
         });
@@ -164,7 +164,6 @@ public class Game {
     }
 
     private HBox constructGuesser() {
-        HBox guesser = new HBox();
         ComboBox<String> propertySelector = new ComboBox<>(FXCollections.observableArrayList(propertyMap.keySet()));
         propertySelector.setPromptText("Choisir un attribut");
         ComboBox<String> valueSelector = new ComboBox<>();
@@ -193,11 +192,10 @@ public class Game {
         poserQuestionLabel.setId("smallTitle");
         poserQuestionLabel.getStylesheets().add("stylesheet.css");
 
-        guesser.getChildren().addAll(new VBox(poserQuestionLabel ,
+        return new HBox(new VBox(poserQuestionLabel ,
                                             new HBox(new VBox(new Label("Attribut:"), propertySelector),
                                                     new VBox(new Label("Valeur:"), valueSelector),
                                                     new VBox(guessResult, guessButton))));
-        return guesser;
     }
 
     public String getJsonName() { return jsonName; }

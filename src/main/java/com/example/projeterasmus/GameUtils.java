@@ -22,12 +22,12 @@ public class GameUtils {
         return map;
     }
 
-    public static HashMap<ArrayList<String>, Integer> getAttributeFrequency(JsonObject jsonRoot, int numPics, ArrayList<Boolean> crossedOut) {
+    public static HashMap<ArrayList<String>, Integer> getAttributeFrequency(JsonObject jsonRoot, ArrayList<Boolean> crossedOut) {
         JsonObject pers = jsonRoot.getAsJsonObject("possibilites");
         HashMap<ArrayList<String>, Integer> map = new HashMap<>();
-        for (int i = 0; i < numPics; i++) {
+        for (int i = 0; i < crossedOut.size(); i++) {
             if (!crossedOut.get(i)) {
-                for (String attribute : GameUtils.findProperties(jsonRoot, numPics).keySet()) {
+                for (String attribute : GameUtils.findProperties(jsonRoot, crossedOut.size()).keySet()) {
                     if (!attribute.equals("nom")) {
                         String value = pers.getAsJsonObject(String.valueOf(i)).get(attribute).getAsString();
                         ArrayList<String> key = new ArrayList<>(Arrays.asList(attribute, value));
@@ -43,7 +43,7 @@ public class GameUtils {
         return map;
     }
 
-    public static ArrayList<String> algoChoice(HashMap<ArrayList<String>, Integer> attributeFrequency, ArrayList<Boolean> crossedOut, JsonObject jsonRoot){
+    public static ArrayList<String> algoChoice(HashMap<ArrayList<String>, Integer> attributeFrequency, ArrayList<Boolean> crossedOut, JsonObject jsonRoot) {
         int remaining = crossedOut.size() - numTrue(crossedOut);
 
         if (remaining == 1) {

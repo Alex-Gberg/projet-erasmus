@@ -9,7 +9,7 @@ Veuillez trouver ci-dessous les instructions pour lancer et jouer le jeu Qui-est
 * [Comment exécuter le programme](#comment-exécuter-le-programme)
 * [Comment jouer](#comment-jouer)
 * [Comment générer un jeu](#comment-générer-un-jeu)
-* [Comment jouer contre l'ordinateur](#comment-jouer-contre-l'ordinateur)
+* [Comment jouer contre l'ordinateur](#comment-jouer-contre-lordinateur)
 
 ## Conditions
 - Java 11

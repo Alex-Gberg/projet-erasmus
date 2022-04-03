@@ -183,7 +183,7 @@ public class Game {
             guessResult.setText("Réponse: " + (processGuess(property, value) ? "Oui!" : "Non"));
             if (vsComputer) {
                 bot.playTurn();
-                botInfo = bot.getBotInfo();
+                botInfo.getChildren().setAll(bot.getBotInfo());
             }
             solvingAlgorithmLabel.setText("");
             stage.sizeToScene();
